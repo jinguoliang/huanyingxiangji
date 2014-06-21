@@ -30,7 +30,6 @@ import android.widget.Toast;
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.R.id;
-import com.example.huanyingxiangji1.pic.JPEGCallBack;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.processor.SomeTool;
 

@@ -1,4 +1,4 @@
-package com.example.huanyingxiangji1.pic;
+package com.example.huanyingxiangji1.activity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
