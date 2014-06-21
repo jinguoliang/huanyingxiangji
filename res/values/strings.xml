@@ -1,0 +1,20 @@
+<resources>
+
+    <string name="app_name">幻影相机</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="main_pic">拍照</string>
+    <string name="main_group">相片组</string>
+    <string name="groupName">组名</string>
+    <string name="CreateGroup">创建新组</string>
+    <string name="deleteGroup">删除组</string>
+    <string name="generateGif">生成GIF</string>
+    <string name="combinate_h">水平合成</string>
+    <string name="combinate_v">垂直合成</string>
+    <string name="add_new_pic">添加新图片</string>
+    <string name="pic_click">拍摄</string>
+    <string name="title">幻影相机</string>
+    
+
+</resources>

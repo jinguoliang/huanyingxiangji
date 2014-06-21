@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <color name="main_color_taste">#ff0055</color>
+    <color name="picture_button_text_color">#000000</color>
+    <color name="blue">#00ff66ff</color>
+</resources>

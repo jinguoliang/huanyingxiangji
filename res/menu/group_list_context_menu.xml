@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/add_new_pic"
+        android:title="@string/add_new_pic">
+    </item>
+    <item
+        android:id="@+id/newGroup"
+        android:title="@string/CreateGroup"/>
+    <item
+        android:id="@+id/deleteGroup"
+        android:title="@string/deleteGroup">
+    </item>
+    <item
+        android:id="@+id/generateGif"
+        android:title="@string/generateGif">
+    </item>
+    <item
+        android:id="@+id/combinate_h"
+        android:title="@string/combinate_h">
+    </item>
+    <item
+        android:id="@+id/combinate_v"
+        android:title="@string/combinate_v">
+    </item>
+
+</menu>
