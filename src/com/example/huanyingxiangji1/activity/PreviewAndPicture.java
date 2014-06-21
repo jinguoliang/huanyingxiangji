@@ -305,23 +305,26 @@ public class PreviewAndPicture extends Activity {
 		Log.e(TAG, "onActivityResult");
 		switch (requestCode) {
 		case REQUEST_SELECT_PIC:// 选择图片返回
-			if (resultCode == RESULT_OK) {
-				if (data != null) {
-					// 这里需要对照片做一些处理
-					// this.bitmap =
-					// MyApplication.getPic(MyApplication.mengPic);
-					// if (this.bitmap != null && !this.bitmap.isRecycled()) {
-					// this.bitmap.recycle();
-					// }
+			if (resultCode == RESULT_OK && data != null) {
+				// 这里需要对照片做一些处理
+				// this.bitmap =
+				// MyApplication.getPic(MyApplication.mengPic);
+				// if (this.bitmap != null && !this.bitmap.isRecycled()) {
+				// this.bitmap.recycle();
+				// }
 
-					mengUri = data.getData();
-					Log.e(TAG, mengUri.toString());
-					// bitmap = Media.getBitmap(getContentResolver(),
-					// mengFileUri);
+				mengUri = data.getData();
 
-					bitmap = null;
+				Log.e(TAG, mengUri.toString());
+				// bitmap = Media.getBitmap(getContentResolver(),
+				// mengFileUri);
 
-					storePreference();
+				bitmap = null;
+
+				storePreference();
+			} else {// 如果没有选择图片，并且之前也没有图片，那就是没有蒙子呗
+				if (mengUri == null) {
+					hasMeng = false;
 				}
 			}
 			break;

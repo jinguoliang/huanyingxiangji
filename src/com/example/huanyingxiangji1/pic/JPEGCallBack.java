@@ -2,7 +2,6 @@ package com.example.huanyingxiangji1.pic;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapFactory.Options;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Handler;
