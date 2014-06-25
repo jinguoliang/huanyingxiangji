@@ -13,6 +13,8 @@ import java.util.List;
 import android.util.Log;
 
 public class FileProcessor {
+	private static final String TAG = FileProcessor.class.getName();
+
 	final String tag="FileProcessor";
 	
 	String groupDirName= "group/";
@@ -88,6 +90,7 @@ public class FileProcessor {
 				String destFilePath = tmpDirFullPath + filename;
 				copyFile(filename, destFilePath);
 			}
+			Log.e(TAG,"remove the file: "+filename);
 			// È»ºó³¹µ×É¾³ý
 			removeFile(filename);
 		}

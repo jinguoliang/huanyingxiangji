@@ -2,6 +2,7 @@ package com.example.huanyingxiangji1.processor;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -114,8 +116,8 @@ public class PicProcessor {
 	// }
 
 	// 将多个图片排列组合成一个图片
-	public void PicCombinate(ArrayList<String> picPathList,
-			String destFilePath, int orientation) throws FileNotFoundException {
+	public void combinate(ArrayList<String> picPathList,
+			String destFilePath, int orientation) throws Exception {
 		Bitmap bitmap = null;
 		Bitmap destBitmap = null;
 		Canvas canvas = null;
@@ -124,7 +126,8 @@ public class PicProcessor {
 		for (int i = 0; i < picPathList.size(); i++) {
 			String fileName = picPathList.get(i);
 			Log.e(tag, fileName);
-			bitmap = BitmapFactory.decodeFile(fileName);
+			
+			bitmap = getBitmapFromUri(null, SomeTool.getUriFromPath(fileName),PicProcessor.SCALE_MID);
 			// 在第一个图片时确定好目的图片的大小
 			if (i == 0) {
 				cellWidth = bitmap.getWidth();
@@ -138,7 +141,7 @@ public class PicProcessor {
 							Bitmap.Config.RGB_565);
 				}
 			} else {
-				resizePicture(bitmap, cellWidth, cellHeight);
+				bitmap=resizePicture(bitmap, cellWidth, cellHeight);
 			}
 
 			canvas = new Canvas(destBitmap);
@@ -151,8 +154,10 @@ public class PicProcessor {
 		}
 
 		Log.e(tag, destFilePath);
+		File outputFile=new File(Environment.getExternalStorageDirectory()+"/"+destFilePath);
+		outputFile.createNewFile();
 		destBitmap.compress(Bitmap.CompressFormat.JPEG, 100,
-				new FileOutputStream(new File(destFilePath)));
+				new FileOutputStream(outputFile));
 	}
 
 	public Bitmap resizePicture(Bitmap bitmap, int cw, int ch) {
