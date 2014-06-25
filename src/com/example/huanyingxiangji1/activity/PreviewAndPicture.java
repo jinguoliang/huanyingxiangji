@@ -37,7 +37,7 @@ public class PreviewAndPicture extends Activity {
 
 	static String TAG = PreviewAndPicture.class.getName();
 
-	private ImageView mengImageView;
+	private MengView mengImageView;
 	private ImageButton pictureButton;
 	private SurfaceView mPreview;
 	private static Camera mCamera;
@@ -102,7 +102,7 @@ public class PreviewAndPicture extends Activity {
 			RelativeLayout preview = (RelativeLayout) findViewById(id.surfaceRelativeLayout);
 			preview.addView(mPreview);
 
-			mengImageView = new ImageView(this);
+			mengImageView = new MengView(this);
 
 			// mengImageView.setScaleType(ScaleType.FIT_END);
 			// RelativeLayout.LayoutParams l=new
@@ -330,43 +330,6 @@ public class PreviewAndPicture extends Activity {
 
 		default:
 			break;
-		}
-	}
-
-	// 触摸控制，起始位置
-	float ox, oy;
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		float x = event.getX();
-		float y = event.getY();
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			ox = x;
-			oy = y;
-			return true;
-		case MotionEvent.ACTION_MOVE:
-			if (x > ox + 20) {// 右划
-			} else if (x < ox - 20) {// 左划
-			} else if (y > oy + 20) {// 下划
-				if (alpha != 0) {
-					alpha -= 5;
-					mengImageView.setAlpha(alpha);
-				}
-				oy = y;
-			} else if (y < oy - 20) {// 上划
-				if (alpha != 240) {
-					alpha += 5;
-					mengImageView.setAlpha(alpha);
-				}
-				oy = y;
-			}
-
-			return true;
-		case MotionEvent.ACTION_UP:
-			return true;
-		default:
-			return true;
 		}
 	}
 
