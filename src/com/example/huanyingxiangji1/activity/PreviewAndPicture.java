@@ -17,13 +17,13 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -112,11 +112,34 @@ public class PreviewAndPicture extends Activity {
 			// preview.addView(mengImageView, l);
 			preview.addView(mengImageView, new LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+			
+			addShotterButton(preview);
+			
+			
 
 		} else {
 			Toast.makeText(this, "相机都没有,快把我卸了吧？", Toast.LENGTH_LONG).show();
 			this.finish();
 		}
+	}
+
+	private void addShotterButton(RelativeLayout preview) {
+		RelativeLayout.LayoutParams params=new android.widget.RelativeLayout.LayoutParams(200, 100);
+		params.alignWithParent=true;
+		params.addRule(RelativeLayout.ALIGN_BOTTOM);
+		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		
+		Button b=new Button(this);
+		b.setText("拍照");
+		preview.addView(b,params);
+		
+		b.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				pictureButtonClick(v);
+			}
+		});
 	}
 
 	// 读取preference里的配置
