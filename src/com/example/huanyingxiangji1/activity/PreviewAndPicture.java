@@ -39,7 +39,7 @@ public class PreviewAndPicture extends Activity {
 
 	private MengView mengImageView;
 	private ImageButton pictureButton;
-	private SurfaceView mPreview;
+	private CameraPreview mPreview;
 	private static Camera mCamera;
 	private String savePath;
 	private boolean hasMeng;// 标记是否已加蒙
@@ -94,9 +94,8 @@ public class PreviewAndPicture extends Activity {
 	}
 
 	private void initialView() {
-		if (SomeTool.checkCameraHardware(this)) {
-
-			mCamera = SomeTool.getCameraInstance();
+		if (SomeTool.checkCameraHardware(this, SomeTool.CAMERA_FRONT)) {
+			mCamera = SomeTool.getCameraInstance(SomeTool.CAMERA_FRONT);
 
 			mPreview = new CameraPreview(this, mCamera);
 			RelativeLayout preview = (RelativeLayout) findViewById(id.surfaceRelativeLayout);
@@ -112,10 +111,8 @@ public class PreviewAndPicture extends Activity {
 			// preview.addView(mengImageView, l);
 			preview.addView(mengImageView, new LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-			
+
 			addShotterButton(preview);
-			
-			
 
 		} else {
 			Toast.makeText(this, "相机都没有,快把我卸了吧？", Toast.LENGTH_LONG).show();
@@ -124,17 +121,18 @@ public class PreviewAndPicture extends Activity {
 	}
 
 	private void addShotterButton(RelativeLayout preview) {
-		RelativeLayout.LayoutParams params=new android.widget.RelativeLayout.LayoutParams(200, 100);
-		params.alignWithParent=true;
+		RelativeLayout.LayoutParams params = new android.widget.RelativeLayout.LayoutParams(
+				200, 100);
+		params.alignWithParent = true;
 		params.addRule(RelativeLayout.ALIGN_BOTTOM);
 		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		
-		Button b=new Button(this);
+
+		Button b = new Button(this);
 		b.setText("拍照");
-		preview.addView(b,params);
-		
+		preview.addView(b, params);
+
 		b.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				pictureButtonClick(v);
@@ -262,7 +260,7 @@ public class PreviewAndPicture extends Activity {
 			menu.getItem(1).setVisible(false);
 		}
 		menu.add(0, 2, 2, "存储路径");
-		menu.add(0, 3, 3, "Picture");
+		menu.add(0, 3, 3, "切換鏡頭");
 
 		mengMenu = menu.getItem(1);
 		return true;
@@ -315,9 +313,17 @@ public class PreviewAndPicture extends Activity {
 			builder.show();
 			break;
 		case 3:// picture
-			pictureButtonClick(null);
+			changeCamera(SomeTool.CAMERA_BACK);
 		}
 		return true;
+	}
+
+	private void changeCamera(int which) {
+		// TODO Auto-generated method stub
+		if (SomeTool.checkCameraHardware(this, which)) {
+			mCamera=SomeTool.getCameraInstance(which);
+		}
+		mPreview.setCamera(mCamera);
 	}
 
 	private static final int REQUEST_SELECT_PIC = 0;

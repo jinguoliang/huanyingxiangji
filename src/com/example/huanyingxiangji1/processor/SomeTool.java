@@ -22,27 +22,55 @@ public class SomeTool {
 		Toast.makeText(c, text, Toast.LENGTH_LONG).show();
 	}
 
+	public static final int CAMERA_FRONT = 1;
+	public static final int CAMERA_BACK = 0;
+
 	@SuppressLint("NewApi")
-	public static Camera getCameraInstance() {
+	public static Camera getCameraInstance(int which) {
 		Camera c = null;
-		// c = Camera.open(); // attempt to get a Camera instance
-		if (c == null)
+		switch (which) {
+		case CAMERA_BACK:
+			c = Camera.open(); // attempt to get a Camera instance
+			if (c == null)
+				c = Camera.open(CAMERA_BACK);
+			break;
+		case CAMERA_FRONT:
 			c = Camera.open(1);
-		if (c == null)
-			c = Camera.open(1);
+			break;
+
+		default:
+			break;
+		}
+
 		return c; // returns null if camera is unavailable
 	}
 
 	/** Check if this device has a camera */
-	public static boolean checkCameraHardware(Context context) {
-		if (context.getPackageManager().hasSystemFeature(
-				PackageManager.FEATURE_CAMERA)) {
-			// this device has a camera
-			return true;
-		} else {
-			// no camera on this device
+	public static boolean checkCameraHardware(Context context, int which) {
+		switch (which) {
+		case CAMERA_FRONT:
+
+			if (context.getPackageManager().hasSystemFeature(
+					PackageManager.FEATURE_CAMERA_FRONT)) {
+				// this device has a camera
+				return true;
+			} else {
+				// no camera on this device
+				return false;
+			}
+		case CAMERA_BACK:
+			if (context.getPackageManager().hasSystemFeature(
+					PackageManager.FEATURE_CAMERA)) {
+				// this device has a camera
+				return true;
+			} else {
+				// no camera on this device
+				return false;
+			}
+		default:
 			return false;
 		}
+
 	}
 
 	static public String getFileUriFrom(Uri uri, Context context) {
