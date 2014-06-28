@@ -11,7 +11,9 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
-        android:text="@string/main_group" />
+        android:text="@string/main_group"
+        android:onClick="onClick"
+	/>
 
     <Button
         android:id="@+id/main_pic_button"
@@ -20,6 +22,7 @@
         android:layout_above="@+id/main_group_button"
         android:layout_centerHorizontal="true"
         android:text="@string/main_pic" 
+        android:onClick="onClick"
        />
 
     <ImageView
@@ -40,5 +43,14 @@
         android:layout_marginTop="83dp"
         android:text="@string/title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/shared"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/main_group_button"
+        android:layout_toRightOf="@+id/textView1"
+        android:onClick="onClick"
+        android:text="分享" />
 
 </RelativeLayout>
