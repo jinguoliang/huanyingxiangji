@@ -111,12 +111,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			}
 			list.add(map);
 		}
-		// PicProcessor gifProcessor=new PicProcessor();
-		// gifProcessor.PicCombinate(dataDir+application.group, fileNames,
-		// dataDir+application.group+"aa.jpg", 1);
-		// gifProcessor.generateGif("",
-		// fileProcessor.getGroup("jin"),dataDir+application.group+"aa.gif",
-		// 1000);
+
 		return list;
 	}
 
@@ -171,6 +166,8 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		if (-1 == id) {
 			super.onContextItemSelected(item);
 		}
+		
+		String destPic="";
 		Map<String, Object> map = list.get(id);
 		groupName = (String) map.get("groupName");
 		switch (item.getItemId()) {
@@ -186,11 +183,20 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			((BaseAdapter) getListAdapter()).notifyDataSetChanged();
 			return true;
 		case R.id.generateGif:
+			destPic=MyApplication.out_path + groupName + ".gif";
+			try {
+				PicProcessor.generateGif(fileProcessor.getGroup(groupName), destPic, 2000);
+				Toast.makeText(this, "已保存到" + MyApplication.out_path,
+						Toast.LENGTH_LONG).show();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
 			return true;
 		case R.id.combinate_h:
 			picProcessor = new PicProcessor();
 			try {
-				String destPic = MyApplication.out_path + groupName + ".jpg";
+				destPic = MyApplication.out_path + groupName + "_h.jpg";
 				picProcessor.combinate(fileProcessor.getGroup(groupName),
 						destPic, 0);
 				Toast.makeText(this, "已保存到" + MyApplication.out_path,
@@ -202,7 +208,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		case R.id.combinate_v:
 			picProcessor = new PicProcessor();
 			try {
-				String destPic = MyApplication.out_path + groupName + ".jpg";
+				destPic = MyApplication.out_path + groupName + "_v.jpg";
 				picProcessor.combinate(fileProcessor.getGroup(groupName),
 						destPic, 1);
 				Toast.makeText(this, "已保存到" + MyApplication.out_path,

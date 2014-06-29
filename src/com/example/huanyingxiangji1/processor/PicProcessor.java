@@ -2,8 +2,6 @@ package com.example.huanyingxiangji1.processor;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +17,9 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
+
+import com.example.huanyingxiangji1.gif.GifEncoder;
 
 //import com.example.huanyingxiangji1.thirdpart.AnimatedGifEncoder;
 
@@ -34,8 +33,6 @@ public class PicProcessor {
 	static final public float SCALE_BIG = 1f;
 
 	public PicProcessor() {
-		// animatedGifEncoder = new AnimatedGifEncoder();
-		// animatedGifEncoder.setQuality(1);
 	}
 
 	// 通过uri获得bitmap
@@ -86,16 +83,33 @@ public class PicProcessor {
 	}
 
 	// 生成gif
-	public void generateGif(String parentDir, List<String> PicPathList,
-			String gifPath, int delay) {
-		// animatedGifEncoder.start(gifPath);
-		// animatedGifEncoder.setDelay(delay);
-		// for (Iterator iterator = PicPathList.iterator(); iterator.hasNext();)
-		// {
-		// String picPath = parentDir + (String) iterator.next();
-		// animatedGifEncoder.addFrame(BitmapFactory.decodeFile(picPath));
-		// }
-		// animatedGifEncoder.finish();
+	public static void generateGif(List<String> picPathList,
+			String gifPath, int delay) throws Exception {
+		try {
+	        GifEncoder gifEncoder = new GifEncoder();
+	        Log.e(TAG,"gifPath = "+gifPath);
+	        gifEncoder.start(new FileOutputStream(Environment.getExternalStorageDirectory()+"/"+gifPath));
+	        
+	        gifEncoder.setDelay(delay); // 500ms between frames
+
+	        // Grab frames and encode them
+	        
+	        Iterator<String> iter = picPathList.iterator();
+	        while (iter.hasNext()) {
+	        	String filename=iter.next();
+	            Bitmap bitmap = getBitmapFromUri(null, SomeTool.getUriFromPath(filename), PicProcessor.SCALE_MID);
+	            gifEncoder.addFrame(bitmap);
+	            bitmap.recycle();
+	            Log.e(TAG,"add one frame " + filename);
+	        }
+
+	        // Make the gif
+	        gifEncoder.finish();
+	        Log.e(TAG, "gif generated");
+	    } catch (IOException err) {
+	    	Log.getStackTraceString(err);
+	    }
+		
 	}
 
 	//
@@ -151,6 +165,7 @@ public class PicProcessor {
 			} else if (orientation == 1) {// 垂直排列
 				canvas.drawBitmap(bitmap, 0, i * cellHeight, null);
 			}
+			bitmap.recycle();
 		}
 
 		Log.e(tag, destFilePath);
