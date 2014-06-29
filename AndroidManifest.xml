@@ -51,6 +51,12 @@
             android:name=".activity.CreateNewGroup"
             android:label="@string/title_activity_main">
         </activity>
+       <activity
+            android:name=".activity.WorkSetActivity"
+            android:label="@string/title_activity_main">
+      </activity>
+        
+        
     </application>
 
 </manifest>
