@@ -90,4 +90,14 @@ public class SomeTool {
 		return Uri.parse("file://" + path);
 	}
 
+	public static enum FileType{
+		JPG,GIF,NONE
+		
+	}
+	public static FileType getFileType(String f) {
+		if (f.endsWith("jpg")) return FileType.JPG;
+		if (f.endsWith("gif")) return FileType.GIF;
+		return FileType.NONE;
+
+	}
 }
