@@ -6,6 +6,7 @@ import java.util.List;
 import com.sun.org.apache.xml.internal.security.Init;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements
@@ -21,26 +23,29 @@ public class CameraPreview extends SurfaceView implements
 	private Camera mCamera;
 	String TAG = "CameraPreview";
 	private SurfaceHolder mHolder;
+	private List<Size> mSupportedPreviewSizes;
+	private Size mPreviewSize;
+	private Context mContext;
 
 	public CameraPreview(Context context, Camera camera) {
 		super(context);
 
+		this.mContext = context;
 		mCamera = camera;
+
 		configCamera();
-		
+
 		mHolder = getHolder();
 		mHolder.addCallback(this);
 
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	}
-	
-	
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		Log.e(TAG, "surfaceChanged");
-		mHolder=holder;
-		Log.e(TAG,"surface width="+width+",height="+height);
+		mHolder = holder;
+		Log.e(TAG, "surface width=" + width + ",height=" + height);
 		mCamera.stopPreview();
 
 		configCamera();
@@ -50,28 +55,62 @@ public class CameraPreview extends SurfaceView implements
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		mCamera.setDisplayOrientation(90);
 		mCamera.startPreview();
 	}
 
 	private void configCamera() {
-		Camera.Parameters param = mCamera.getParameters();
-		param.setPictureFormat(PixelFormat.JPEG);
-		 List<Size>list= param.getSupportedPreviewSizes();
+		WindowManager wm = (WindowManager) mContext
+				.getSystemService(Context.WINDOW_SERVICE);
+		int width = wm.getDefaultDisplay().getWidth();
+		int height = wm.getDefaultDisplay().getHeight();
+		if (mCamera != null) {
+			mSupportedPreviewSizes = mCamera.getParameters()
+					.getSupportedPreviewSizes();
+		}
+		mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width,
+				height);
+		Camera.Parameters parameters = mCamera.getParameters();
+		parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
 
-//		 for (int i = 0; i <list.size(); i++) {
-//		
-//		 Log.e(TAG, "height:"+param.getSupportedPreviewSizes().get(i).height);
-//		 Log.e(TAG,"width:"+ param.getSupportedPreviewSizes().get(i).width);
-//		 }
+		
+		mCamera.setParameters(parameters);
+		mCamera.setDisplayOrientation(90);
 
-		param.setPreviewSize(1440,816);
-		param.setPictureSize(1440, 816);
-//		Size previewSize=param.getPreviewSize();
-//		Size pictureSize=param.getPictureSize();
-//		Log.e(TAG,"previewSize="+previewSize.width+","+previewSize.height);
-//		Log.e(TAG,"previewSize="+pictureSize.width+","+pictureSize.height);
-		mCamera.setParameters(param);
+	}
+
+	private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
+		final double ASPECT_TOLERANCE = 0.1;
+		double targetRatio = (double) w / h;
+		if (sizes == null)
+			return null;
+
+		Size optimalSize = null;
+		double minDiff = Double.MAX_VALUE;
+
+		int targetHeight = h;
+
+		// Try to find an size match aspect ratio and size
+		for (Size size : sizes) {
+			double ratio = (double) size.width / size.height;
+			if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
+				continue;
+			if (Math.abs(size.height - targetHeight) < minDiff) {
+				optimalSize = size;
+				minDiff = Math.abs(size.height - targetHeight);
+			}
+		}
+
+		// Cannot find the one match the aspect ratio, ignore the requirement
+		if (optimalSize == null) {
+			minDiff = Double.MAX_VALUE;
+			for (Size size : sizes) {
+				if (Math.abs(size.height - targetHeight) < minDiff) {
+					optimalSize = size;
+					minDiff = Math.abs(size.height - targetHeight);
+				}
+			}
+		}
+		return optimalSize;
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
@@ -86,18 +125,21 @@ public class CameraPreview extends SurfaceView implements
 
 	@SuppressLint("NewApi")
 	public void setCamera(Camera c) {
-		Log.e(TAG,"setCamera");
+		Log.e(TAG, "setCamera");
+
 		mCamera.stopPreview();
 		mCamera.release();
-		mCamera=c;
+		
+		mCamera = c;
+
 		configCamera();
 		try {
 			mCamera.setPreviewDisplay(mHolder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		mCamera.startPreview();
 	}
-	
+
 }
