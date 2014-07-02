@@ -268,6 +268,8 @@ public class PreviewAndPicture extends Activity {
 
 	MenuItem mengMenu;
 
+	private int mWhichCamera=SomeTool.CAMERA_FRONT;
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -313,17 +315,25 @@ public class PreviewAndPicture extends Activity {
 			builder.show();
 			break;
 		case 3:// picture
-			changeCamera(SomeTool.CAMERA_BACK);
+			if (mWhichCamera==SomeTool.CAMERA_BACK) {
+				changeCamera(SomeTool.CAMERA_FRONT);
+			}else{
+				changeCamera(SomeTool.CAMERA_BACK);
+			}
 		}
 		return true;
 	}
 
 	private void changeCamera(int which) {
 		// TODO Auto-generated method stub
+		if (mWhichCamera==which) return;
+		
+		
 		if (SomeTool.checkCameraHardware(this, which)) {
 			mCamera=SomeTool.getCameraInstance(which);
 		}
 		mPreview.setCamera(mCamera);
+		mWhichCamera=which;
 	}
 
 	private static final int REQUEST_SELECT_PIC = 0;
