@@ -2,99 +2,104 @@ package com.example.huanyingxiangji1.activity;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.TypedArray;
+import android.annotation.SuppressLint;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.View.OnCreateContextMenuListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.BaseAdapter;
-import android.widget.Gallery;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 
-public class ViewPicture extends Activity {
-	String tag="PictrueView";
+@SuppressLint("ValidFragment")
+public class ViewPicture extends FragmentActivity {
+	String tag = ViewPicture.class.getName();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		super.onCreate(savedInstanceState);
-	    setContentView(R.layout.pic_view);
-	   
-//	    通过全局变量传过来的图片数据
-	    String groupName=getIntent().getStringExtra("groupName");
-	    String dataDir=Environment.getExternalStorageDirectory().getAbsolutePath()+
-				"/"+MyApplication.APP_SD_DIR;
-		FileProcessor processor=new FileProcessor(dataDir);
-		ArrayList<String>list=processor.getGroup(groupName);
-	    Gallery gallery = (Gallery) findViewById(R.id.gallery);
-	    gallery.setAdapter(new ImageAdapter(this,list.toArray()));
-		registerForContextMenu(gallery);
+		setContentView(R.layout.pic_view);
+		// 通过全局变量传过来的图片数据
+		String groupName = getIntent().getStringExtra("groupName");
+		String dataDir = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/" + MyApplication.APP_SD_DIR;
+		FileProcessor processor = new FileProcessor(dataDir);
+		ArrayList<String> list = processor.getGroup(groupName);
+		ViewPager vp = (ViewPager) findViewById(R.id.gallary);
+		vp.setAdapter(new FragmentPager(this, list));
 
 	}
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		// TODO Auto-generated method stub
 		super.onCreateContextMenu(menu, v, menuInfo);
 	}
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
 		return super.onContextItemSelected(item);
 	}
-	
-	public class ImageAdapter extends BaseAdapter {
-	    int mGalleryItemBackground;
-	    private Context mContext;
 
-	    private Object[] filePath;
+	class FragmentPager extends FragmentPagerAdapter {
 
-	    public ImageAdapter(Context c,Object[] filePath) {
-	        mContext = c;
-	        TypedArray attr = mContext.obtainStyledAttributes(R.styleable.HelloGallery);
-	        mGalleryItemBackground = attr.getResourceId(
-	                R.styleable.HelloGallery_android_galleryItemBackground, 0);
-	        attr.recycle();
-	        
-	        this.filePath=filePath;
-	        
-	    }
+		private ArrayList<String> filePath;
+		private FragmentActivity mContext;
 
-	    public int getCount() {
-	        return filePath.length;
-	    }
+		public FragmentPager(FragmentActivity c, ArrayList<String> filePath) {
+			super(c.getSupportFragmentManager());
+			mContext = c;
+			this.filePath = filePath;
+		}
 
-	    public Object getItem(int position) {
-	        return position;
-	    }
+		@Override
+		public Fragment getItem(int position) {
+			return new ViewFragment(filePath.get(position));
+		}
 
-	    public long getItemId(int position) {
-	        return position;
-	    }
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return filePath.size();
+		}
 
-	    public View getView(int position, View convertView, ViewGroup parent) {
-	        ImageView imageView = new ImageView(mContext);
-
-	        imageView.setImageBitmap(BitmapFactory.decodeFile((String) filePath[position]));
-	        imageView.setLayoutParams(new Gallery.LayoutParams(450, 600));
-	        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-	        imageView.setBackgroundResource(mGalleryItemBackground);
-	        return imageView;
-	    }
 	}
-	
+
+	class ViewFragment extends Fragment {
+		private String mImagePath;
+
+		@SuppressLint("ValidFragment")
+		public ViewFragment(String path) {
+			mImagePath = path;
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			ImageView imageView = new ImageView(getActivity());
+
+			imageView.setImageBitmap(BitmapFactory.decodeFile(mImagePath));
+			return imageView;
+		}
+	}
+
 }
