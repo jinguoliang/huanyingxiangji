@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -17,17 +18,17 @@ import android.view.View;
 
 /**
  * GifView<br>
- * 本类可以显示�?��gif动画，其使用方法和android的其它view（如imageview)�?���?br>
- * 如果要显示的gif太大，会出现OOM的问题�?
+ * 本类可以显示�?��gif动画，其使用方法和android的其它view（如imageview)�?���?br>
+ * 如果要显示的gif太大，会出现OOM的问题�?
  *
  * @author liao
- * @author archko 修改为解析所有图�?然后传回来播�?
+ * @author archko 修改为解析所有图�?然后传回来播�?
  */
 public class GifView extends View implements GifAction {
 
     public static final String TAG="GifView";
     /**
-     * gif解码�?
+     * gif解码�?
      */
     private GifDecoder gifDecoder=null;
     /**
@@ -56,14 +57,14 @@ public class GifView extends View implements GifAction {
     private GifImageType animationType=GifImageType.ANIMATION;
 
     /**
-     * 解码过程中，Gif动画显示的方�?br>
+     * 解码过程中，Gif动画显示的方�?br>
      * 如果图片较大，那么解码过程会比较长，这个解码过程中，gif如何显示
      *
      * @author liao
      */
     public enum GifImageType {
         /**
-         * 在解码过程中，不显示图片，直到解码全部成功后，再显示，废�?
+         * 在解码过程中，不显示图片，直到解码全部成功后，再显示，废�?
          */
         WAIT_FINISH(0),
         /**
@@ -71,11 +72,11 @@ public class GifView extends View implements GifAction {
          */
         SYNC_DECODER(1),
         /**
-         * 只显示第�?��图片
+         * 只显示第�?��图片
          */
         COVER(2),
         /**
-         * 动画显示�?���?
+         * 动画显示�?���?
          */
         ANIMATION(3);
 
@@ -86,8 +87,29 @@ public class GifView extends View implements GifAction {
         final int nativeInt;
     }
 
+    /**
+     * This constructor is used jut in main thread
+     * @param context
+     */
     public GifView(Context context) {
         super(context);
+        mHandler=new Handler(){
+        	public void dispatchMessage(Message msg) {
+        		invalidate();
+        	};
+        };
+    }
+    
+    
+    /**
+     * If not created in main thread, we need git it a handler which in main thread.
+     * beacause the handler need to be used to invalidate the view.
+     * @param context
+     * @param h
+     */
+    public GifView(Context context,Handler h) {
+        super(context);
+        mHandler=h;
     }
 
     public GifView(Context context, AttributeSet attrs) {
@@ -99,7 +121,7 @@ public class GifView extends View implements GifAction {
     }
 
     /**
-     * 设置图片，并�?��解码
+     * 设置图片，并�?��解码
      *
      * @param gif 要设置的图片
      */
@@ -113,7 +135,7 @@ public class GifView extends View implements GifAction {
     }
 
     /**
-     * 设置图片，开始解�?
+     * 设置图片，开始解�?
      *
      * @param is 要设置的图片
      */
@@ -160,18 +182,17 @@ public class GifView extends View implements GifAction {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //Log.d(TAG, "onDraw.currentImage:"+currentImage);
+        Log.d(TAG, "onDraw.currentImage:"+currentImage);
         if (gifFrames==null||frameLength<1) {
             Log.d(TAG, "gifFrames:"+frameLength);
             return;
         }
 
-        //Log.d(TAG, "onDraw:ci:"+currentImage);
+        Log.d(TAG, "onDraw:ci:"+currentImage);
 
         if (currentImage==null) {
             currentImage=gifFrames.get(currImageIdx).image;
         }
-
         if (currentImage==null) {
             return;
         }
@@ -188,7 +209,8 @@ public class GifView extends View implements GifAction {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.d(TAG, "onMeasure:"+widthMeasureSpec+" height:"+heightMeasureSpec);
+        Log.e(TAG, "onMeasure:"+widthMeasureSpec+" height:"+heightMeasureSpec);
+        
         int pleft=getPaddingLeft();
         int pright=getPaddingRight();
         int ptop=getPaddingTop();
@@ -220,14 +242,14 @@ public class GifView extends View implements GifAction {
         widthSize=resolveSize(w, widthMeasureSpec);
         heightSize=resolveSize(h, heightMeasureSpec);
 
-        //Log.d(TAG, "widthSize:"+widthSize+" heightSize:"+heightSize+" w:"+w+" h:"+h);
-
+        Log.d(TAG, "widthSize:"+widthSize+" heightSize:"+heightSize+" w:"+w+" h:"+h);
+        heightSize=400;
         setMeasuredDimension(widthSize, heightSize);
     }
 
     /**
-     * 只显示第�?��图片<br>
-     * 调用本方法后，gif不会显示动画，只会显示gif的第�?���?
+     * 只显示第�?��图片<br>
+     * 调用本方法后，gif不会显示动画，只会显示gif的第�?���?
      */
     public void showCover() {
         Log.d(TAG, "showCover.");
@@ -265,8 +287,8 @@ public class GifView extends View implements GifAction {
     }
 
     /**
-     * 设置gif在解码过程中的显示方�?br>
-     * <strong>本方法只能在setGifImage方法之前设置，否则设置无�?/strong>
+     * 设置gif在解码过程中的显示方�?br>
+     * <strong>本方法只能在setGifImage方法之前设置，否则设置无�?/strong>
      *
      * @param type 显示方式
      */
@@ -277,11 +299,11 @@ public class GifView extends View implements GifAction {
     }
 
     /**
-     * 设置要显示的图片的大�?br>
-     * 当设置了图片大小 之后，会按照设置的大小来显示gif（按设置后的大小来进行拉伸或压缩�?
+     * 设置要显示的图片的大�?br>
+     * 当设置了图片大小 之后，会按照设置的大小来显示gif（按设置后的大小来进行拉伸或压缩�?
      *
-     * @param width  要显示的图片�?
-     * @param height 要显示的图片�?
+     * @param width  要显示的图片�?
+     * @param height 要显示的图片�?
      */
     public void setShowDimension(int width, int height) {
         Log.d(TAG, "setShowDimension.width:"+width+" height:"+height);
@@ -353,7 +375,7 @@ public class GifView extends View implements GifAction {
         Log.d(TAG, "dispatchWindowFocusChanged:"+hasFocus);
     }*/
 
-    //这个方法不一定执�?如果没有�?��资源,会导致cpu与内存占用率很高.
+    //这个方法不一定执�?如果没有�?��资源,会导致cpu与内存占用率很高.
     @Override
     public void dispatchWindowVisibilityChanged(int visibility) {
         Log.d(TAG, "dispatchWindowVisibilityChanged:"+visibility);
@@ -385,7 +407,7 @@ public class GifView extends View implements GifAction {
 
                 GifFrame frame=gifFrames.get(currImageIdx++);
                 if (currImageIdx>=frameLength) {
-                    currImageIdx=0;//重新播放�?
+                    currImageIdx=0;//重新播放�?
                 }
 
                 currentImage=frame.image;
@@ -422,17 +444,23 @@ public class GifView extends View implements GifAction {
         Log.d(TAG, "reDraw.");
         if (mHandler!=null) {
             Message msg=mHandler.obtainMessage();
+            msg.obj=this;
             mHandler.sendMessage(msg);
         }
     }
 
-    private Handler mHandler=new Handler() {
-
-        @Override
-        public void handleMessage(Message msg) {
-            invalidate();
-        }
-    };
+    private Handler mHandler=null;
+//    		new Handler() {
+//
+//        @Override
+//        public void handleMessage(Message msg) {
+//        	if (currentImage!=null) {
+//				measure(currentImage.getWidth(), currentImage.getHeight());
+//			}
+//            invalidate();
+//            Log.e(TAG,"invalidate redraw");
+//        }
+//    };
 
     /**
      * 动画线程
@@ -443,7 +471,7 @@ public class GifView extends View implements GifAction {
 
         @Override
         public void run() {
-            //Log.d(TAG, "DrawThread.run.");
+            Log.d(TAG, "DrawThread.run.");
             if (gifFrames==null||frameLength<1) {
                 return;
             }
@@ -451,15 +479,16 @@ public class GifView extends View implements GifAction {
             while (isRun) {
                 GifFrame frame=gifFrames.get(currImageIdx++);
                 if (currImageIdx>=frameLength) {
-                    currImageIdx=0;//重新播放�?
+                    currImageIdx=0;//重新播放�?
                     //break;
                 }
 
                 currentImage=frame.image;
                 if (pause==false) {
                     long delay=frame.delay;
-                    //Log.d(TAG, "run.currentImage:"+currentImage+" pause:"+pause+" isRun:"+isRun+" delay:"+delay);
+                    Log.d(TAG, "run.currentImage:"+currentImage+" pause:"+pause+" isRun:"+isRun+" delay:"+delay);
                     Message msg=mHandler.obtainMessage();
+                    msg.obj=GifView.this;
                     mHandler.sendMessage(msg);
                     SystemClock.sleep(delay);
                 } else {
@@ -473,11 +502,11 @@ public class GifView extends View implements GifAction {
     }
 
     //////----------------------
-    ArrayList<GifFrame> gifFrames=new ArrayList<GifFrame>(); //存储�?当前帧不应该太多,如果�?��gif较大,如超�?m会是个问�?
-    int currImageIdx=0;//当前显示的解析图片索�?
+    ArrayList<GifFrame> gifFrames=new ArrayList<GifFrame>(); //存储�?当前帧不应该太多,如果�?��gif较大,如超�?m会是个问�?
+    int currImageIdx=0;//当前显示的解析图片索�?
     int frameLength=0; //帧的长度
 
-    //回调方法,通过它可以回调解码失败或成功后的�?��操作.
+    //回调方法,通过它可以回调解码失败或成功后的�?��操作.
     /*IImageLoadCallback imageLoadCallback;
 
     public void setImageLoadCallback(IImageLoadCallback imageLoadCallback) {

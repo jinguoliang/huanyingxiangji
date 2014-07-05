@@ -620,6 +620,8 @@ public class GifDecoder extends Thread {
         // logical screen size
         width=readShort();
         height=readShort();
+        Log.e(TAG,"width:"+width);
+        Log.e(TAG,"height:"+height);
         // packed fields
         int packed=read();
         gctFlag=(packed&0x80)!=0; // 1 : global color table flag
