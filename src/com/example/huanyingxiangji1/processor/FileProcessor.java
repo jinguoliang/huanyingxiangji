@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 
 import com.example.huanyingxiangji1.MyApplication;
@@ -118,6 +122,23 @@ public class FileProcessor {
 		copyFile(file2, destFilePath2);
 	}
 
+	public boolean copyFile(InputStream in, OutputStream out) {
+		int byteread = 0; // 读取的字节数
+
+		try {
+			byte[] buffer = new byte[1024];
+
+			while ((byteread = in.read(buffer)) != -1) {
+				out.write(buffer, 0, byteread);
+			}
+			return true;
+		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
+		} 
+	}
+
 	public boolean copyFile(String srcFilePath, String destFilePath) {
 		File srcFile = new File(srcFilePath);
 		File destFile = new File(destFilePath);
@@ -128,15 +149,9 @@ public class FileProcessor {
 		try {
 			in = new FileInputStream(srcFile);
 			out = new FileOutputStream(destFile);
-			byte[] buffer = new byte[1024];
-
-			while ((byteread = in.read(buffer)) != -1) {
-				out.write(buffer, 0, byteread);
-			}
-			return true;
+			
+			return copyFile(in, out);
 		} catch (FileNotFoundException e) {
-			return false;
-		} catch (IOException e) {
 			return false;
 		} finally {
 			try {
@@ -150,12 +165,46 @@ public class FileProcessor {
 		}
 	}
 
-	public void addToGroup(String groupName, String filePath) {
+	static public InputStream getInputStreamFrom(Uri uri, Context context) {
+		String path = "";
+		InputStream in = null;
+		if (uri.getScheme().equals("content")) {
+			Cursor c = context.getContentResolver().query(uri, null, null,
+					null, null);
+			c.moveToFirst();
+			byte buf[] = c.getBlob(c.getColumnIndex(Media.DATA));
+			
+			try {
+				in = context.getContentResolver().openInputStream(uri);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				in = new FileInputStream(uri.getPath());
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return in;
+	}
+	
+	public void addToGroup(String groupName, InputStream in) {
 		int currentIndex = getGroup(groupDirFullPath, groupName).size() + 1;
 		String destFileName = groupDirFullPath + groupName + "&" + currentIndex
 				+ ".jpg";
 		System.out.println(destFileName);
-		copyFile(filePath, destFileName);
+		OutputStream out = null;
+		try {
+			out = new FileOutputStream(destFileName);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		copyFile(in, out);
 	}
 	
 	public static String getSDPath(String path){

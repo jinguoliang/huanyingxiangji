@@ -33,9 +33,11 @@ import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
+import com.example.huanyingxiangji1.processor.SomeTool;
 
 public class GroupList extends ListActivity implements OnItemClickListener {
 	private static final int CREATE_GROUP = 1;
+	private static final String TAG = GroupList.class.getName();
 	String tag = "GroupList";
 	List<Map<String, Object>> list;
 	MyApplication application;
@@ -251,9 +253,8 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			list.add(map);
 			((BaseAdapter) getListAdapter()).notifyDataSetChanged();
 		} else if (requestCode == 7) {
-			fileProcessor.addToGroup(groupName, data.getData().toString()
-					.substring(7));
-			// 还应该更新列表
+			fileProcessor.addToGroup(groupName, fileProcessor.getInputStreamFrom(data.getData(), this));
+			//TODO 还应该更新列表
 		}
 	}
 
