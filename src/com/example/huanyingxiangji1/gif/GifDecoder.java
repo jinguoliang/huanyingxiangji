@@ -1,12 +1,12 @@
 package com.example.huanyingxiangji1.gif;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.util.Log;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.util.Log;
 
 /**
  * gif解码

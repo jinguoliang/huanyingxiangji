@@ -16,7 +16,6 @@ import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
-import com.example.huanyingxiangji1.processor.SomeTool;
 
 public class CreateNewGroup extends Activity implements OnClickListener {
 

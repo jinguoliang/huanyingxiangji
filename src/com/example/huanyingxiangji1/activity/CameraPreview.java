@@ -3,8 +3,6 @@ package com.example.huanyingxiangji1.activity;
 import java.io.IOException;
 import java.util.List;
 
-import com.sun.org.apache.xml.internal.security.Init;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
@@ -13,7 +11,6 @@ import android.hardware.Camera.Size;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements

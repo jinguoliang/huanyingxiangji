@@ -11,10 +11,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.example.huanyingxiangji1.MyApplication;
-
-import android.os.Environment;
 import android.util.Log;
+
+import com.example.huanyingxiangji1.MyApplication;
 
 public class FileProcessor {
 	private static final String TAG = FileProcessor.class.getName();

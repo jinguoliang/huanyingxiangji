@@ -1,10 +1,14 @@
 package com.example.huanyingxiangji1.gif;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+
 import android.graphics.Bitmap;
 import android.graphics.Color;
-
-import java.io.*;
-import java.nio.ByteBuffer;
 
 /**
  * Class AnimatedGifEncoder - Encodes a GIF file consisting of one or
