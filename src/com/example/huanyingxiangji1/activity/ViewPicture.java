@@ -95,7 +95,7 @@ public class ViewPicture extends FragmentActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			ImageView imageView = new ImageView(getActivity());
+			ImageView imageView = new MengView(getActivity());
 
 			imageView.setImageBitmap(BitmapFactory.decodeFile(mImagePath));
 			return imageView;
