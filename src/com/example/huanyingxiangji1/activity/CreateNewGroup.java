@@ -36,7 +36,15 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 		okButton = (Button) findViewById(R.id.OK);
 		cancelButton = (Button) findViewById(R.id.cancel);
 		groupNameText = (EditText) findViewById(R.id.groupNameInput);
-
+		okButton.setOnClickListener(this);
+		cancelButton.setOnClickListener(this);
+		picButton1.setOnClickListener(this);
+		picButton2.setOnClickListener(this);
+		
+		if (getIntent().getExtras()==null) {
+			return ;
+		}
+		
 		// ¶ÁÈ¡Á½¸öÍ¼Æ¬
 		pic1 = getIntent().getExtras().getString("mengpic");
 		pic2 = getIntent().getExtras().getString("newpic");
@@ -57,10 +65,7 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 		picButton1.setImageBitmap(mengPic);
 		picButton2.setImageBitmap(newPic);
 
-		okButton.setOnClickListener(this);
-		cancelButton.setOnClickListener(this);
-		picButton1.setOnClickListener(this);
-		picButton2.setOnClickListener(this);
+
 
 	}
 
