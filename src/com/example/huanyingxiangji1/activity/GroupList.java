@@ -36,14 +36,17 @@ import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.processor.SomeTool;
 
 public class GroupList extends ListActivity implements OnItemClickListener {
-	private static final int CREATE_GROUP = 1;
 	private static final String TAG = GroupList.class.getName();
+	
+	private static final int CREATE_GROUP = 1;
+	private static final int ADD_NEW_PICTURE = 2;
+	
 	String tag = "GroupList";
 	List<Map<String, Object>> list;
 	MyApplication application;
 	FileProcessor fileProcessor;
 	PicProcessor picProcessor;
-	private String groupName;
+	private String mCurrentGroupName;
 	private String dataDir;
 
 	/*
@@ -168,7 +171,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		
 		String destPic="";
 		Map<String, Object> map = list.get(id);
-		groupName = (String) map.get("groupName");
+		mCurrentGroupName = (String) map.get("groupName");
 		switch (item.getItemId()) {
 		case R.id.newGroup:
 			Log.e(tag, "new");
@@ -177,14 +180,14 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			return true;
 		case R.id.deleteGroup:
 			Log.e(tag, "del");
-			fileProcessor.removeGroup(groupName, false);
+			fileProcessor.removeGroup(mCurrentGroupName, false);
 			list.remove(id);
 			((BaseAdapter) getListAdapter()).notifyDataSetChanged();
 			return true;
 		case R.id.generateGif:
-			destPic=MyApplication.out_path + groupName + ".gif";
+			destPic=MyApplication.out_path + mCurrentGroupName + ".gif";
 			try {
-				PicProcessor.generateGif(fileProcessor.getGroup(groupName), destPic, 2000);
+				PicProcessor.generateGif(fileProcessor.getGroup(mCurrentGroupName), destPic, 2000);
 				Toast.makeText(this, "已保存到" + MyApplication.out_path,
 						Toast.LENGTH_LONG).show();
 			} catch (Exception e1) {
@@ -195,8 +198,8 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		case R.id.combinate_h:
 			picProcessor = new PicProcessor();
 			try {
-				destPic = MyApplication.out_path + groupName + "_h.jpg";
-				picProcessor.combinate(fileProcessor.getGroup(groupName),
+				destPic = MyApplication.out_path + mCurrentGroupName + "_h.jpg";
+				picProcessor.combinate(fileProcessor.getGroup(mCurrentGroupName),
 						destPic, 0);
 				Toast.makeText(this, "已保存到" + MyApplication.out_path,
 						Toast.LENGTH_LONG).show();
@@ -207,8 +210,8 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		case R.id.combinate_v:
 			picProcessor = new PicProcessor();
 			try {
-				destPic = MyApplication.out_path + groupName + "_v.jpg";
-				picProcessor.combinate(fileProcessor.getGroup(groupName),
+				destPic = MyApplication.out_path + mCurrentGroupName + "_v.jpg";
+				picProcessor.combinate(fileProcessor.getGroup(mCurrentGroupName),
 						destPic, 1);
 				Toast.makeText(this, "已保存到" + MyApplication.out_path,
 						Toast.LENGTH_LONG).show();
@@ -220,7 +223,9 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 			intent.addCategory(Intent.CATEGORY_DEFAULT);
 			intent.setType("image/*");
-			startActivityForResult(intent, 7);
+			Log.e(TAG,"groupName = "+mCurrentGroupName);
+
+			startActivityForResult(intent, ADD_NEW_PICTURE);
 			return true;
 		default:
 			return super.onContextItemSelected(item);
@@ -233,11 +238,26 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		i.putExtra("groupName", list.get(pos).get("groupName").toString());
 		startActivity(i);
 	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+		outState.putString("groupName", mCurrentGroupName);
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle state) {
+		// TODO Auto-generated method stub
+		super.onRestoreInstanceState(state);
+		mCurrentGroupName=state.getString("groupName");
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == CREATE_GROUP && resultCode == 5) {
+		Log.e(TAG,"onActivityResult");
+		if (requestCode == CREATE_GROUP && resultCode == RESULT_OK) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			String groupName = data.getExtras().getString("groupName");
 			map.put("groupName", groupName);
@@ -252,8 +272,9 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			}
 			list.add(map);
 			((BaseAdapter) getListAdapter()).notifyDataSetChanged();
-		} else if (requestCode == 7) {
-			fileProcessor.addToGroup(groupName, fileProcessor.getInputStreamFrom(data.getData(), this));
+		} else if (requestCode == ADD_NEW_PICTURE&&resultCode==RESULT_OK) {
+			Log.e(TAG,"groupName = "+mCurrentGroupName);
+			fileProcessor.addToGroup(mCurrentGroupName, fileProcessor.getInputStreamFrom(data.getData(), this));
 			//TODO 还应该更新列表
 		}
 	}

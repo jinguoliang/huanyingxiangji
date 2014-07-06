@@ -83,11 +83,12 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 			processor.createGroup(groupName, pic1.substring(7),
 					pic2.substring(7));
 			intent.putExtra("groupName", groupName);
-			setResult(5, intent);
+			Log.e(TAG,"groupName:"+groupName);
+			setResult(RESULT_OK, intent);
 			this.finish();
 			break;
 		case R.id.cancel:
-			setResult(4);
+			setResult(RESULT_CANCELED);
 			this.finish();
 			break;
 		case R.id.picButton1:
