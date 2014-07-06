@@ -23,6 +23,8 @@ public class CameraPreview extends SurfaceView implements
 	private List<Size> mSupportedPreviewSizes;
 	private Size mPreviewSize;
 	private Context mContext;
+	private List<Size> mSupportedPictureSizes;
+	private Size mPictureSize;
 
 	public CameraPreview(Context context, Camera camera) {
 		super(context);
@@ -63,11 +65,17 @@ public class CameraPreview extends SurfaceView implements
 		if (mCamera != null) {
 			mSupportedPreviewSizes = mCamera.getParameters()
 					.getSupportedPreviewSizes();
+			mSupportedPictureSizes = mCamera.getParameters()
+					.getSupportedPictureSizes();
 		}
-		mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width,
-				height);
+		//TODO the implement need to change a little, now I just exchange the two param
+		mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, height,
+				width);
+		mPictureSize = getOptimalPreviewSize(mSupportedPictureSizes, height,
+				width);
 		Camera.Parameters parameters = mCamera.getParameters();
 		parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+		parameters.setPictureSize(mPictureSize.width, mPictureSize.height);
 
 		
 		mCamera.setParameters(parameters);
