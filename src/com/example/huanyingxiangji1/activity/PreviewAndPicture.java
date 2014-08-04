@@ -259,7 +259,7 @@ public class PreviewAndPicture extends Activity {
 			menu.getItem(1).setVisible(false);
 		}
 		menu.add(0, 2, 2, "´æ´¢Â·¾¶");
-		menu.add(0, 3, 3, "ÇÐ“QçRî^");
+		menu.add(0, 3, 3, "ÇÐ»»¾µÍ·");
 
 		mengMenu = menu.getItem(1);
 		return true;
