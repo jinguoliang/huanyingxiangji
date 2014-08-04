@@ -1,5 +1,6 @@
 package com.example.huanyingxiangji1.processor;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -116,14 +117,30 @@ public class FileProcessor {
 	// 创建组，参数为组名，两个文件，以后的文件可以调用addToGroup添加
 	public void createGroup(String groupName, String file1, String file2) {
 
+
+	}
+	
+	public void createGroup(String groupName, Uri pic1Uri, Uri pic2Uri,
+			Context c) throws IOException {
 		// 得到俩个源文件和目的文件
 		String destFilePath1 = groupDirFullPath + groupName + "&1.jpg";
 		String destFilePath2 = groupDirFullPath + groupName + "&2.jpg";
 
 		checkDirs();
+		
+		Log.e(TAG,"copying....");
 		// 复制文件
-		copyFile(file1, destFilePath1);
-		copyFile(file2, destFilePath2);
+		InputStream in=c.getContentResolver().openInputStream(pic1Uri);
+		OutputStream out=new FileOutputStream(new File(destFilePath1));
+		copyFile(in, out);
+		in.close();
+		out.close();
+		in=c.getContentResolver().openInputStream(pic2Uri);
+		out=new FileOutputStream(new File(destFilePath2));
+		copyFile(in, out);
+		in.close();
+		out.close();
+		Log.e(TAG,"copy ending");
 	}
 
 	public boolean copyFile(InputStream in, OutputStream out) {
@@ -133,6 +150,7 @@ public class FileProcessor {
 			byte[] buffer = new byte[1024];
 
 			while ((byteread = in.read(buffer)) != -1) {
+				Log.d(TAG,"pppp");
 				out.write(buffer, 0, byteread);
 			}
 			return true;
@@ -168,6 +186,8 @@ public class FileProcessor {
 			}
 		}
 	}
+	
+
 
 	static public InputStream getInputStreamFrom(Uri uri, Context context) {
 		String path = "";
@@ -263,6 +283,8 @@ public class FileProcessor {
 			dir.mkdir();
 		}
 	}
+
+
 
 	
 	

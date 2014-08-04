@@ -1,10 +1,15 @@
 package com.example.huanyingxiangji1.activity;
 
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +31,8 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 	private String TAG = "CreateNewGroup";
 	private Bitmap mengPic;
 	private Bitmap newPic;
+	private Uri mPic1Uri;
+	private Uri mPic2Uri;
 
 	protected void onCreate(android.os.Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,22 +47,24 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 		cancelButton.setOnClickListener(this);
 		picButton1.setOnClickListener(this);
 		picButton2.setOnClickListener(this);
-		
-		if (getIntent().getExtras()==null) {
-			return ;
+
+		if (getIntent().getExtras() == null) {
+			return;
 		}
-		
+
 		// ¶ÁÈ¡Á½¸öÍ¼Æ¬
 		pic1 = getIntent().getExtras().getString("mengpic");
 		pic2 = getIntent().getExtras().getString("newpic");
+		mPic1Uri = Uri.parse(pic1);
+		mPic2Uri = Uri.parse(pic2);
 
 		Log.e(TAG, "pic1 path: " + pic1);
 		Log.e(TAG, "pic2 path: " + pic2);
 
 		try {
-			mengPic = PicProcessor.getBitmapFromUri(this, Uri.parse(pic1),
+			mengPic = PicProcessor.getBitmapFromUri(this, mPic1Uri,
 					PicProcessor.SCALE_SMALL);
-			newPic = PicProcessor.getBitmapFromUri(this, Uri.parse(pic2),
+			newPic = PicProcessor.getBitmapFromUri(this, mPic2Uri,
 					PicProcessor.SCALE_SMALL);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -64,8 +73,6 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 
 		picButton1.setImageBitmap(mengPic);
 		picButton2.setImageBitmap(newPic);
-
-
 
 	}
 
@@ -80,10 +87,19 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 					+ MyApplication.APP_SD_DIR;
 			FileProcessor processor = new FileProcessor(path);
 			String groupName = groupNameText.getText().toString();
-			processor.createGroup(groupName, pic1.substring(7),
-					pic2.substring(7));
+			Uri uri;
+			try {
+				processor.createGroup(groupName, mPic1Uri,
+						mPic2Uri,this);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			intent.putExtra("groupName", groupName);
-			Log.e(TAG,"groupName:"+groupName);
+			Log.e(TAG, "groupName:" + groupName);
 			setResult(RESULT_OK, intent);
 			this.finish();
 			break;
@@ -117,10 +133,10 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode==RESULT_CANCELED) {
-			return ;
+		if (resultCode == RESULT_CANCELED) {
+			return;
 		}
-		
+
 		if (data == null) {
 			throw new RuntimeException("no data");
 		} else {
