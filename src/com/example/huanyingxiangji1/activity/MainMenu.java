@@ -10,6 +10,7 @@ import android.view.Window;
 import android.widget.Button;
 
 import com.example.huanyingxiangji1.R;
+import com.example.huanyingxiangji1.processor.FileProcessor;
 
 public class MainMenu extends Activity implements OnClickListener{
 
@@ -30,6 +31,8 @@ public class MainMenu extends Activity implements OnClickListener{
         picButton.setOnClickListener(this);
         groupButton.setOnClickListener(this);
         workset.setOnClickListener(this);
+        
+        FileProcessor.checkDirs();
     }
 
     @Override

@@ -88,7 +88,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		List<Map<String, Object>> list;
 		Map<String, Object> map;
 
-		checkDir();
+		FileProcessor.checkDirs();
 
 		dataDir = Environment.getExternalStorageDirectory().getAbsolutePath()
 				+ "/" + application.APP_SD_DIR;
@@ -117,39 +117,8 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		return list;
 	}
 
-	// 检查内存卡,如果可用返回true
-	private boolean checkMedia() {
-		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
-	// 构建存储数据的目录
-	private void checkDir() {
-		if (checkMedia()) {
-			File sdcard = Environment.getExternalStorageDirectory();
-			File appDataDirFile = new File(sdcard.getAbsolutePath() + "/"
-					+ MyApplication.APP_SD_DIR);
-			if (!appDataDirFile.exists()) {
-				appDataDirFile.mkdir();
-			}
-			File groupDirFile = new File(MyApplication.group_path);
-			File tmpDirFile = new File(MyApplication.tmp_path);
-			File outDirFile = new File(MyApplication.out_path);
-			if (!groupDirFile.exists()) {
-				groupDirFile.mkdir();
-			}
-			if (!tmpDirFile.exists()) {
-				tmpDirFile.mkdir();
-			}
-			if (!outDirFile.exists()) {
-				outDirFile.mkdir();
-			}
-		}
-	}
+
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,

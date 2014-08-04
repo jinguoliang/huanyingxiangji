@@ -14,6 +14,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 
@@ -24,8 +25,8 @@ public class FileProcessor {
 
 	final String tag = "FileProcessor";
 
-	String groupDirName = "group/";
-	String tmpDirName = "tmp/";
+	String groupDirName = MyApplication.GROUP_DIR;
+	String tmpDirName = MyApplication.TMP_DIR;
 
 	String groupDirFullPath;
 	String tmpDirFullPath;
@@ -67,6 +68,7 @@ public class FileProcessor {
 			// return false;
 			// }
 		};
+		Log.d(TAG,"groupDirFullPath = "+groupDirFullPath);
 		String[] tmp = new File(groupDirFullPath).list();
 		for (int i = 0; i < tmp.length; i++) {
 			String aGroupNamne = this.getGroupName(tmp[i]);
@@ -113,10 +115,12 @@ public class FileProcessor {
 
 	// 创建组，参数为组名，两个文件，以后的文件可以调用addToGroup添加
 	public void createGroup(String groupName, String file1, String file2) {
+
 		// 得到俩个源文件和目的文件
 		String destFilePath1 = groupDirFullPath + groupName + "&1.jpg";
 		String destFilePath2 = groupDirFullPath + groupName + "&2.jpg";
 
+		checkDirs();
 		// 复制文件
 		copyFile(file1, destFilePath1);
 		copyFile(file2, destFilePath2);
@@ -224,6 +228,42 @@ public class FileProcessor {
 		}
 		return list;
 	}
+	
+	
+	// 检查内存卡,如果可用返回true
+	private static boolean checkMedia() {
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	// 构建存储数据的目录
+	public static  void checkDirs() {
+		Log.d(TAG,"check Dirs");
+		if (checkMedia()) {
+			Log.d(TAG,"check Media finish");
+			String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+			checkDir(sdcardPath + MyApplication.APP_SD_DIR);
+			Log.d(TAG,"group_path = "+MyApplication.group_path);
+			checkDir(sdcardPath +MyApplication.group_path);
+			checkDir(sdcardPath +MyApplication.tmp_path);
+			checkDir(sdcardPath +MyApplication.out_path);
+		}
+		else{
+			Log.e(TAG,"media card is not mounted");
+		}
+	}
+	
+	public static void checkDir(String path){
+		File dir = new File(path);
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+	}
+
 	
 	
 }
