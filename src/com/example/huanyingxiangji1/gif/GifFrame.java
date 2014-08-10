@@ -15,11 +15,9 @@ public class GifFrame {
     }
 
     /**
-     * 图片
      */
     public Bitmap image;
     /**
-     * 延时
      */
     public int delay;
 }

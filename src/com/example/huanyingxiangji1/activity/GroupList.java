@@ -101,7 +101,6 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			String groupName = (String) iterator.next();
 			map = new HashMap<String, Object>();
 			map.put("groupName", groupName);
-			// 读取组内的图片
 			List<String> filePaths = fileProcessor.getGroup(groupName);
 			for (int i = 0; i < filePaths.size(); i++) {
 				String picPath = filePaths.get(i);
@@ -157,7 +156,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			destPic=MyApplication.out_path + mCurrentGroupName + ".gif";
 			try {
 				PicProcessor.generateGif(fileProcessor.getGroup(mCurrentGroupName), destPic, 2000);
-				Toast.makeText(this, "已保存到" + MyApplication.out_path,
+				Toast.makeText(this, "ok " + MyApplication.out_path,
 						Toast.LENGTH_LONG).show();
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -170,7 +169,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 				destPic = MyApplication.out_path + mCurrentGroupName + "_h.jpg";
 				picProcessor.combinate(fileProcessor.getGroup(mCurrentGroupName),
 						destPic, 0);
-				Toast.makeText(this, "已保存到" + MyApplication.out_path,
+				Toast.makeText(this, "ok " + MyApplication.out_path,
 						Toast.LENGTH_LONG).show();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -182,7 +181,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 				destPic = MyApplication.out_path + mCurrentGroupName + "_v.jpg";
 				picProcessor.combinate(fileProcessor.getGroup(mCurrentGroupName),
 						destPic, 1);
-				Toast.makeText(this, "已保存到" + MyApplication.out_path,
+				Toast.makeText(this, "ok " + MyApplication.out_path,
 						Toast.LENGTH_LONG).show();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -244,7 +243,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		} else if (requestCode == ADD_NEW_PICTURE&&resultCode==RESULT_OK) {
 			Log.e(TAG,"groupName = "+mCurrentGroupName);
 			fileProcessor.addToGroup(mCurrentGroupName, fileProcessor.getInputStreamFrom(data.getData(), this));
-			//TODO 还应该更新列表
+			//TODO 
 		}
 	}
 

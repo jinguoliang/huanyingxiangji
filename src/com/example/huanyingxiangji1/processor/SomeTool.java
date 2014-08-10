@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+//import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -79,26 +79,26 @@ public class SomeTool {
 		}
 	}
 
-	static public InputStream getInputStreamFrom(Uri uri, Context context) {
-		String path = "";
-		InputStream in = null;
-		if (uri.getScheme().equals("content")) {
-			Cursor c = context.getContentResolver().query(uri, null, null,
-					null, null);
-			c.moveToFirst();
-			byte buf[] = c.getBlob(c.getColumnIndex(Media.DATA));
-			in = new ByteInputStream(buf, buf.length);
-		} else {
-			try {
-				in = new FileInputStream(new File(uri.getPath()));
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		return in;
-	}
+//	static public InputStream getInputStreamFrom(Uri uri, Context context) {
+//		String path = "";
+//		InputStream in = null;
+//		if (uri.getScheme().equals("content")) {
+//			Cursor c = context.getContentResolver().query(uri, null, null,
+//					null, null);
+//			c.moveToFirst();
+//			byte buf[] = c.getBlob(c.getColumnIndex(Media.DATA));
+//			in = new ByteInputStream(buf, buf.length);
+//		} else {
+//			try {
+//				in = new FileInputStream(new File(uri.getPath()));
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		return in;
+//	}
 
 	public static Uri getUriFromPath(String path) {
 		return Uri.parse("file://" + path);

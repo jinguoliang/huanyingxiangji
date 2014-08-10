@@ -35,12 +35,10 @@ public class PicProcessor {
 	public PicProcessor() {
 	}
 
-	// 通过uri获得bitmap
 	public static Bitmap getBitmapFromUri(Context c, Uri uri, float scale)
 			throws Exception {
 		Bitmap b = null;
 		if (uri.getScheme().equals("content")) {
-			// SomeTool.makeToast("从文件管理选择吧，暂时不能从相簿选择，以后会好的，相信我", this);
 			b = BitmapFactory.decodeStream(c.getContentResolver()
 					.openInputStream(uri));
 		} else {
@@ -49,7 +47,7 @@ public class PicProcessor {
 
 		}
 		if (b == null) {
-			throw new Exception("找不着这图片呀，这是为什么呢？您删了吗？");
+			throw new Exception("hello error");
 		}
 		Bitmap tmp = Bitmap.createScaledBitmap(b, (int) (b.getWidth() * scale),
 				(int) (b.getHeight() * scale), true);
@@ -67,7 +65,6 @@ public class PicProcessor {
 		out.close();
 	}
 
-	// 旋转图片
 	static public Bitmap rotatePic(Bitmap bitmap) {
 		// Log.e("imageview","width:"+mengImageView.getWidth()+" : height: "+mengImageView.getHeight());
 		// Log.e("surface","width:"+surfaceView.getWidth()+" : height: "+surfaceView.getHeight());
@@ -82,7 +79,6 @@ public class PicProcessor {
 		return tmp;
 	}
 
-	// 生成gif
 	public static void generateGif(List<String> picPathList,
 			String gifPath, int delay) throws Exception {
 		try {
@@ -113,7 +109,6 @@ public class PicProcessor {
 	}
 
 	//
-	// //分离gif，通过参数来得到分离的图片，返回值是两图片间的延迟
 	// public int seperateGif(String gifPath,ArrayList<BufferedImage>list) {
 	// ArrayList<BufferedImage>tmp=new ArrayList<BufferedImage>();
 	// int t = 0;
@@ -129,7 +124,6 @@ public class PicProcessor {
 	// return t;
 	// }
 
-	// 将多个图片排列组合成一个图片
 	public void combinate(ArrayList<String> picPathList,
 			String destFilePath, int orientation) throws Exception {
 		Bitmap bitmap = null;
@@ -142,14 +136,13 @@ public class PicProcessor {
 			Log.e(tag, fileName);
 			
 			bitmap = getBitmapFromUri(null, SomeTool.getUriFromPath(fileName),PicProcessor.SCALE_MID);
-			// 在第一个图片时确定好目的图片的大小
 			if (i == 0) {
 				cellWidth = bitmap.getWidth();
 				cellHeight = bitmap.getHeight();
-				if (orientation == 0) {// 水平排列,
+				if (orientation == 0) {
 					destBitmap = Bitmap.createBitmap(picPathList.size()
 							* cellWidth, cellHeight, Bitmap.Config.RGB_565);
-				} else if (orientation == 1) {// 垂直排列
+				} else if (orientation == 1) {
 					destBitmap = Bitmap.createBitmap(cellWidth,
 							picPathList.size() * cellHeight,
 							Bitmap.Config.RGB_565);
@@ -159,10 +152,10 @@ public class PicProcessor {
 			}
 
 			canvas = new Canvas(destBitmap);
-			// 把图片画在目的图片上
-			if (orientation == 0) {// 水平排列
+
+			if (orientation == 0) {
 				canvas.drawBitmap(bitmap, i * cellWidth, 0, null);
-			} else if (orientation == 1) {// 垂直排列
+			} else if (orientation == 1) {
 				canvas.drawBitmap(bitmap, 0, i * cellHeight, null);
 			}
 			bitmap.recycle();

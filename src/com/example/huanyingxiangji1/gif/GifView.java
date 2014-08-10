@@ -15,24 +15,13 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-/**
- * GifView<br>
- * 本类可以显示�?��gif动画，其使用方法和android的其它view（如imageview)�?���?br>
- * 如果要显示的gif太大，会出现OOM的问题�?
- *
- * @author liao
- * @author archko 修改为解析所有图�?然后传回来播�?
- */
+
 public class GifView extends View implements GifAction {
 
     public static final String TAG="GifView";
-    /**
-     * gif解码�?
-     */
+
     private GifDecoder gifDecoder=null;
-    /**
-     * 当前要画的帧的图
-     */
+
     private Bitmap currentImage=null;
 
     private boolean isRun=true;
@@ -55,28 +44,15 @@ public class GifView extends View implements GifAction {
 
     private GifImageType animationType=GifImageType.ANIMATION;
 
-    /**
-     * 解码过程中，Gif动画显示的方�?br>
-     * 如果图片较大，那么解码过程会比较长，这个解码过程中，gif如何显示
-     *
-     * @author liao
-     */
+
     public enum GifImageType {
-        /**
-         * 在解码过程中，不显示图片，直到解码全部成功后，再显示，废�?
-         */
+
         WAIT_FINISH(0),
-        /**
-         * 和解码过程同步，解码进行到哪里，图片显示到哪里，废除
-         */
+
         SYNC_DECODER(1),
-        /**
-         * 只显示第�?��图片
-         */
+
         COVER(2),
-        /**
-         * 动画显示�?���?
-         */
+
         ANIMATION(3);
 
         GifImageType(int i) {
@@ -119,11 +95,7 @@ public class GifView extends View implements GifAction {
         super(context, attrs, defStyle);
     }
 
-    /**
-     * 设置图片，并�?��解码
-     *
-     * @param gif 要设置的图片
-     */
+
     public void setGifDecoderImage(byte[] gif) {
         if (gifDecoder!=null) {
             gifDecoder.free();
@@ -133,11 +105,7 @@ public class GifView extends View implements GifAction {
         gifDecoder.start();
     }
 
-    /**
-     * 设置图片，开始解�?
-     *
-     * @param is 要设置的图片
-     */
+
     private void setGifDecoderImage(InputStream is) {
         Log.d(TAG, "setGifDecoderImage.");
         if (gifDecoder!=null) {
@@ -148,29 +116,17 @@ public class GifView extends View implements GifAction {
         gifDecoder.start();
     }
 
-    /**
-     * 以字节数据形式设置gif图片
-     *
-     * @param gif 图片
-     */
+
     public void setGifImage(byte[] gif) {
         setGifDecoderImage(gif);
     }
 
-    /**
-     * 以字节流形式设置gif图片
-     *
-     * @param is 图片
-     */
+
     public void setGifImage(InputStream is) {
         setGifDecoderImage(is);
     }
 
-    /**
-     * 以资源形式设置gif图片
-     *
-     * @param resId gif图片的资源ID
-     */
+
     public void setGifImage(int resId) {
         Log.d(TAG, "setGifImage.");
         Resources r=this.getResources();
@@ -246,10 +202,6 @@ public class GifView extends View implements GifAction {
         setMeasuredDimension(widthSize, heightSize);
     }
 
-    /**
-     * 只显示第�?��图片<br>
-     * 调用本方法后，gif不会显示动画，只会显示gif的第�?���?
-     */
     public void showCover() {
         Log.d(TAG, "showCover.");
         if (gifFrames==null||frameLength<1) {
@@ -262,10 +214,7 @@ public class GifView extends View implements GifAction {
         invalidate();
     }
 
-    /**
-     * 继续显示动画<br>
-     * 本方法在调用showCover后，会让动画继续显示，如果没有调用showCover方法，则没有任何效果
-     */
+
     public void showAnimation() {
         Log.d(TAG, "showAnimation.");
         if (pause) {
@@ -285,25 +234,14 @@ public class GifView extends View implements GifAction {
         drawThread.start();
     }
 
-    /**
-     * 设置gif在解码过程中的显示方�?br>
-     * <strong>本方法只能在setGifImage方法之前设置，否则设置无�?/strong>
-     *
-     * @param type 显示方式
-     */
+
     public void setGifImageType(GifImageType type) {
         if (gifDecoder==null) {
             animationType=type;
         }
     }
 
-    /**
-     * 设置要显示的图片的大�?br>
-     * 当设置了图片大小 之后，会按照设置的大小来显示gif（按设置后的大小来进行拉伸或压缩�?
-     *
-     * @param width  要显示的图片�?
-     * @param height 要显示的图片�?
-     */
+
     public void setShowDimension(int width, int height) {
         Log.d(TAG, "setShowDimension.width:"+width+" height:"+height);
         if (width>0&&height>0) {
@@ -369,12 +307,7 @@ public class GifView extends View implements GifAction {
         startAnimate();
     }
 
-    /*@Override
-    public void dispatchWindowFocusChanged(boolean hasFocus){
-        Log.d(TAG, "dispatchWindowFocusChanged:"+hasFocus);
-    }*/
 
-    //这个方法不一定执�?如果没有�?��资源,会导致cpu与内存占用率很高.
     @Override
     public void dispatchWindowVisibilityChanged(int visibility) {
         Log.d(TAG, "dispatchWindowVisibilityChanged:"+visibility);
@@ -406,7 +339,7 @@ public class GifView extends View implements GifAction {
 
                 GifFrame frame=gifFrames.get(currImageIdx++);
                 if (currImageIdx>=frameLength) {
-                    currImageIdx=0;//重新播放�?
+                    currImageIdx=0;
                 }
 
                 currentImage=frame.image;
@@ -415,9 +348,7 @@ public class GifView extends View implements GifAction {
         }
     }
 
-    /**
-     * 停止动画与一切解码相关的操作.
-     */
+
     public void stopAnimate() {
         Log.d(TAG, "stopAnimate.");
         isRun=false;
@@ -461,11 +392,7 @@ public class GifView extends View implements GifAction {
 //        }
 //    };
 
-    /**
-     * 动画线程
-     *
-     * @author liao
-     */
+
     private class DrawThread extends Thread {
 
         @Override
@@ -478,7 +405,7 @@ public class GifView extends View implements GifAction {
             while (isRun) {
                 GifFrame frame=gifFrames.get(currImageIdx++);
                 if (currImageIdx>=frameLength) {
-                    currImageIdx=0;//重新播放�?
+                    currImageIdx=0;
                     //break;
                 }
 
@@ -501,14 +428,12 @@ public class GifView extends View implements GifAction {
     }
 
     //////----------------------
-    ArrayList<GifFrame> gifFrames=new ArrayList<GifFrame>(); //存储�?当前帧不应该太多,如果�?��gif较大,如超�?m会是个问�?
-    int currImageIdx=0;//当前显示的解析图片索�?
-    int frameLength=0; //帧的长度
+    ArrayList<GifFrame> gifFrames=new ArrayList<GifFrame>();
+    int currImageIdx=0;
+    int frameLength=0;
 
-    //回调方法,通过它可以回调解码失败或成功后的�?��操作.
-    /*IImageLoadCallback imageLoadCallback;
 
-    public void setImageLoadCallback(IImageLoadCallback imageLoadCallback) {
-        this.imageLoadCallback=imageLoadCallback;
-    }*/
+//    public void setImageLoadCallback(IImageLoadCallback imageLoadCallback) {
+//        this.imageLoadCallback=imageLoadCallback;
+//    }
 }

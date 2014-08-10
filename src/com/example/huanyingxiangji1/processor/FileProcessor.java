@@ -37,7 +37,6 @@ public class FileProcessor {
 		tmpDirFullPath = storeDirName + tmpDirName;
 	}
 
-	// 有组名返回该组的文件名列表
 	public ArrayList<String> getGroup(String parent, String groupName) {
 		ArrayList<String> list = new ArrayList<String>();
 		String[] tmp = new File(groupDirFullPath).list();
@@ -55,7 +54,6 @@ public class FileProcessor {
 		return getGroup(groupDirFullPath, groupName);
 	}
 
-	// 得到存在的组名
 	public List<String> getAllGroupName() {
 		ArrayList<String> list = new ArrayList<String>() {
 			// @Override
@@ -81,7 +79,6 @@ public class FileProcessor {
 		return list;
 	}
 
-	// 由文件名得到组名，如果不能得到组名返回null
 	public String getGroupName(String fileName) {
 		int indexofq = fileName.lastIndexOf("&");
 		String tmp = null;
@@ -91,30 +88,26 @@ public class FileProcessor {
 		return tmp;
 	}
 
-	// 移除一个组，并可根据后以参数决定是否彻底删除
 	public void removeGroup(String groupName, boolean isRealDel) {
 
 		for (Iterator<String> iterator = getGroup(groupDirFullPath, groupName)
 				.iterator(); iterator.hasNext();) {
 			String filename = iterator.next();
-			if (!isRealDel) {// 如果不是彻底删除就先复制到tmp文件夹中
+			if (!isRealDel) {
 				String destFilePath = tmpDirFullPath + filename;
 				copyFile(filename, destFilePath);
 			}
 			Log.e(TAG, "remove the file: " + filename);
-			// 然后彻底删除
 			removeFile(filename);
 		}
 
 	}
 
-	// 删除一个文件
 	public boolean removeFile(String fileName) {
 		File file = new File(fileName);
 		return file.delete();
 	}
 
-	// 创建组，参数为组名，两个文件，以后的文件可以调用addToGroup添加
 	public void createGroup(String groupName, String file1, String file2) {
 
 
@@ -122,14 +115,12 @@ public class FileProcessor {
 	
 	public void createGroup(String groupName, Uri pic1Uri, Uri pic2Uri,
 			Context c) throws IOException {
-		// 得到俩个源文件和目的文件
 		String destFilePath1 = groupDirFullPath + groupName + "&1.jpg";
 		String destFilePath2 = groupDirFullPath + groupName + "&2.jpg";
 
 		checkDirs();
 		
 		Log.e(TAG,"copying....");
-		// 复制文件
 		InputStream in=c.getContentResolver().openInputStream(pic1Uri);
 		OutputStream out=new FileOutputStream(new File(destFilePath1));
 		copyFile(in, out);
@@ -144,7 +135,7 @@ public class FileProcessor {
 	}
 
 	public boolean copyFile(InputStream in, OutputStream out) {
-		int byteread = 0; // 读取的字节数
+		int byteread = 0;
 
 		try {
 			byte[] buffer = new byte[1024];
@@ -164,7 +155,7 @@ public class FileProcessor {
 	public boolean copyFile(String srcFilePath, String destFilePath) {
 		File srcFile = new File(srcFilePath);
 		File destFile = new File(destFilePath);
-		int byteread = 0; // 读取的字节数
+		int byteread = 0;
 		InputStream in = null;
 		OutputStream out = null;
 
@@ -250,7 +241,6 @@ public class FileProcessor {
 	}
 	
 	
-	// 检查内存卡,如果可用返回true
 	private static boolean checkMedia() {
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -260,7 +250,6 @@ public class FileProcessor {
 		}
 	}
 	
-	// 构建存储数据的目录
 	public static  void checkDirs() {
 		Log.d(TAG,"check Dirs");
 		if (checkMedia()) {

@@ -11,9 +11,7 @@ import android.util.Log;
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 
-/*
- * ±£´æÎªjpegÍ¼Æ¬
- */
+
 public class JPEGCallBack implements PictureCallback {
 
 	String path;

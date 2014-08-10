@@ -205,7 +205,6 @@ class WorksLoader extends AsyncTaskLoader<List<WorkSetActivity.ImageData>> {
 
 				try {
 
-					// 上面文件是为了得到InputStream.这里使用固定的文件,你看情况替换.
 					gifView.setGifImage(new FileInputStream(path));
 					/*
 					 * FileInputStream fileInputStream=new

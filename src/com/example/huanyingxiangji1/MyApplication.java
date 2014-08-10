@@ -7,10 +7,10 @@ import android.app.Application;
 import android.graphics.Bitmap;
 
 public class MyApplication extends Application {
-	final public static String APP_SD_DIR="/huanyingxiangji/"; //应用根目录
-	final public static String GROUP_DIR="group/";	//组
+	final public static String APP_SD_DIR="/huanyingxiangji/"; //the root of application
+	final public static String GROUP_DIR="group/";
 	final public static String TMP_DIR="tmp/";	
-	final public  static String OUT_DIR="out/";   //gif 
+	final public  static String OUT_DIR="out/"; 
 	public static final String group_path=APP_SD_DIR+GROUP_DIR;
 	public static final String tmp_path=APP_SD_DIR+TMP_DIR;
 	public static final String out_path=APP_SD_DIR+OUT_DIR;

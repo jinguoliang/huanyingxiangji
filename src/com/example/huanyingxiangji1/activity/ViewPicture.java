@@ -36,7 +36,6 @@ public class ViewPicture extends FragmentActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.pic_view);
-		// 通过全局变量传过来的图片数据
 		String groupName = getIntent().getStringExtra("groupName");
 		String dataDir = Environment.getExternalStorageDirectory()
 				.getAbsolutePath() + "/" + MyApplication.APP_SD_DIR;

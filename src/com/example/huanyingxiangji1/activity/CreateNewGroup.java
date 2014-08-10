@@ -37,7 +37,6 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 	protected void onCreate(android.os.Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.create_new_group);
-		// 绑定控件
 		picButton1 = (ImageButton) findViewById(R.id.picButton1);
 		picButton2 = (ImageButton) findViewById(R.id.picButton2);
 		okButton = (Button) findViewById(R.id.OK);
@@ -52,7 +51,6 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 			return;
 		}
 
-		// 读取两个图片
 		pic1 = getIntent().getExtras().getString("mengpic");
 		pic2 = getIntent().getExtras().getString("newpic");
 		mPic1Uri = Uri.parse(pic1);

@@ -17,24 +17,20 @@ public class GifDecoder extends Thread {
 
     public static final String TAG="GifDecoder";
     /**
-     * 状�?：正在解码中
      */
     public static final int STATUS_PARSING=0;
     /**
-     * 状�?：图片格式错�?
      */
     public static final int STATUS_FORMAT_ERROR=1;
     /**
-     * 状�?：打�?���?
      */
     public static final int STATUS_OPEN_ERROR=2;
     /**
-     * 状�?：解码成�?
      */
     public static final int STATUS_FINISH=-1;
 
-    private InputStream in;//�?��解码的流
-    private byte[] gifData=null;//�?��解码的数�?
+    private InputStream in;
+    private byte[] gifData=null;
     private int status;
 
     public int width; // full image width
@@ -87,7 +83,7 @@ public class GifDecoder extends Thread {
     private int frameCount;
 
     private GifAction action=null;
-    ArrayList<GifFrame> frame2ArrayList;//存放解析的帧�?
+    ArrayList<GifFrame> frame2ArrayList;
 
     public ArrayList<GifFrame> getFrameArrayList() {
         return frame2ArrayList;
@@ -214,8 +210,6 @@ public class GifDecoder extends Thread {
 			    }
 			}
         
-			//TODO 这里创建Bitmap也会消�?较多的内�?�?��改为rgb数组就可以了.
-			//但是如果这样,画图时缩放的问题,本人没有找到如何处理.
 	        try {
 	            image=Bitmap.createBitmap(dest, width, height, Config.ARGB_4444);
 	            frame2ArrayList.add(new GifFrame(image, delay));
@@ -226,8 +220,6 @@ public class GifDecoder extends Thread {
 		} catch (OutOfMemoryError e1) {
 			e1.printStackTrace();
 
-			//TODO 因为解析太大的文件会出现oome,�?��这里设置了后就不能再继续解析�?
-			//因为不能申请到更多的内存. 出现异常后的帧无法解�?但保证了前面的帧是正常的.
 			status=STATUS_FINISH;
 		}
     }
@@ -612,7 +604,6 @@ public class GifDecoder extends Thread {
         }
         resetFrame();
         //action.parseOk(true,frameCount);    
-        //Log.d(TAG, "解析�?��：现在�?帧数�?+colorsArr.size());
     }
 
     private void readLSD() {
@@ -673,169 +664,6 @@ public class GifDecoder extends Thread {
         } while ((blockSize>0)&&!err());
     }
 
-    ///////////////--------------------
-    /**
-     * 当前状�?
-     *
-     * @return
-     */
-    /*@Deprecated
-    public int getStatus() {
-        return status;
-    }*/
-
-    /**
-     * 解码是否成功，成功返回true
-     *
-     * @return 成功返回true，否则返回false
-     */
-    /*@Deprecated
-    public boolean parseOk() {
-        return status==STATUS_FINISH;
-    }*/
-
-    /**
-     * 取某帧的延时时间
-     *
-     * @param n 第几�?
-     * @return 延时时间，毫�?
-     */
-    /*@Deprecated
-    public int getDelay(int n) {
-        Log.d(TAG, "getDelay.");
-        delay=-1;
-        if ((n>=0)&&(n<frameCount)) {
-            // delay = ((GifFrame) frames.elementAt(n)).delay;
-            GifFrame f=getFrame(n);
-            if (f!=null)
-                delay=f.delay;
-        }
-        return delay;
-    }*/
-
-    /**
-     * 取所有帧的延时时�?
-     *
-     * @return
-     */
-    /*@Deprecated
-    public int[] getDelays() {
-        Log.d(TAG, "getDelays.");
-        GifFrame f=gifFrame;
-        int[] d=new int[frameCount];
-        int i=0;
-        while (f!=null&&i<frameCount) {
-            d[i]=f.delay;
-            f=f.nextFrame;
-            i++;
-        }
-        return d;
-    }*/
-
-    /**
-     * 取�?�?�?
-     *
-     * @return 图片的�?帧数
-     */
-    /*@Deprecated
-    public int getFrameCount() {
-        return frameCount;
-    }*/
-
-    /**
-     * 取第�?��图片
-     *
-     * @return
-     */
-    /*@Deprecated
-    public Bitmap getImage() {
-        return getColorFrame(0);
-    }*/
-
-    /*@Deprecated
-    public int getLoopCount() {
-        return loopCount;
-    }*/
-
-    /**
-     * 取第几帧的图�?
-     *
-     * @param n 帧数
-     * @return 可画的图片，如果没有此帧或�?出错，返回null
-     */
-    /*@Deprecated
-    public Bitmap getColorFrame(int n) {
-        Log.d(TAG, "getColorFrame.n:"+n);
-        GifFrame frame=getFrame(n);
-        if (frame==null)
-            return null;
-        else
-            return frame.image;
-    }*/
-
-    /**
-     * 取当前帧图片
-     *
-     * @return 当前帧可画的图片
-     */
-    /*@Deprecated
-    public GifFrame getCurrentFrame() {
-        return currentFrame;
-    }*/
-
-    /**
-     * 取第几帧，每帧包含了可画的图片和延时时间
-     *
-     * @param n 帧数
-     * @return
-     */
-    /*@Deprecated
-    public GifFrame getFrame(int n) {
-        Log.d(TAG, "getFrame.n:"+n);
-        GifFrame frame=gifFrame;
-        int i=0;
-        while (frame!=null) {
-            if (i==n) {
-                return frame;
-            } else {
-                frame=frame.nextFrame;
-            }
-            i++;
-        }
-        return null;
-    }*/
-
-    /**
-     * 重置，进行本操作后，会直接到第一�?
-     */
-    /*@Deprecated
-    public void reset() {
-        currentFrame=gifFrame;
-    }*/
-
-    /**
-     * 下一帧，进行本操作后，�?过getCurrentFrame得到的是下一�?
-     *
-     * @return 返回下一�?
-     */
-    /*@Deprecated
-    public GifFrame next() {
-        Log.d(TAG, "next");
-        if (isShow==false) {
-            isShow=true;
-            return gifFrame;
-        } else {
-            if (status==STATUS_PARSING) {
-                if (currentFrame.nextFrame!=null)
-                    currentFrame=currentFrame.nextFrame;
-                //currentFrame = gifFrame;
-            } else {
-                currentFrame=currentFrame.nextFrame;
-                if (currentFrame==null) {
-                    currentFrame=gifFrame;
-                }
-            }
-            return currentFrame;
-        }
-    }*/
 }
+
+

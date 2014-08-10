@@ -41,7 +41,7 @@ public class PreviewAndPicture extends Activity {
 	private CameraPreview mPreview;
 	private static Camera mCamera;
 	private String savePath;
-	private boolean hasMeng;// 标记是否已加蒙
+	private boolean hasMeng;
 	private Uri mengUri;
 	private int alpha = 5;
 	private Bitmap bitmap;
@@ -51,11 +51,10 @@ public class PreviewAndPicture extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case 0:
-				// 重新开始预览
 				mCamera.startPreview();
 				break;
 			case 1:
-				if (PreviewAndPicture.this.hasMeng) {// 打开createGroup界面
+				if (PreviewAndPicture.this.hasMeng) {
 					Log.e(TAG, "ok to create group");
 
 					Intent i = new Intent(PreviewAndPicture.this,
@@ -64,7 +63,6 @@ public class PreviewAndPicture extends Activity {
 					i.putExtra("newpic", "file:///" + MyApplication.newPicPath);
 					PreviewAndPicture.this.startActivity(i);
 				} else {
-					// 重新开始预览
 					mCamera.startPreview();
 				}
 				break;
@@ -80,7 +78,6 @@ public class PreviewAndPicture extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.pic_activity);
 
-		// 绑定控件
 		// pictureButton = (ImageButton) findViewById(R.id.pic_button);
 
 		readPreference();
@@ -114,7 +111,7 @@ public class PreviewAndPicture extends Activity {
 			addShotterButton(preview);
 
 		} else {
-			Toast.makeText(this, "相机都没有,快把我卸了吧？", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "no camera", Toast.LENGTH_LONG).show();
 			this.finish();
 		}
 	}
@@ -127,7 +124,7 @@ public class PreviewAndPicture extends Activity {
 		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 
 		Button b = new Button(this);
-		b.setText("拍照");
+		b.setText("picture");
 		preview.addView(b, params);
 
 		b.setOnClickListener(new OnClickListener() {
@@ -139,7 +136,6 @@ public class PreviewAndPicture extends Activity {
 		});
 	}
 
-	// 读取preference里的配置
 	private void readPreference() {
 		SharedPreferences mengPicPreference = getSharedPreferences(
 				"mengPicPreference", MODE_PRIVATE);
@@ -149,7 +145,6 @@ public class PreviewAndPicture extends Activity {
 		// File
 		File storeDir = Environment
 				.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		// File storeDir = getFilesDir(); // 存到内部私有目录
 		Log.e(TAG, storeDir.getAbsolutePath());
 		savePath = mengPicPreference.getString("savePath",
 				storeDir.getAbsolutePath());
@@ -174,7 +169,7 @@ public class PreviewAndPicture extends Activity {
 	};
 
 	private void loadMeng(boolean isReload) {
-		// 设置蒙
+		// 锟斤拷锟斤拷锟斤拷
 		if (hasMeng && (bitmap == null || isReload)) {
 			try {
 				Log.e(TAG, "loadMeng.....");
@@ -187,7 +182,7 @@ public class PreviewAndPicture extends Activity {
 			}
 			// MyApplication.putPic(MyApplication.mengPic, bitmap);
 			if (bitmap == null) {
-				Toast.makeText(this, "蒙图片不见了,请重新设置", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "no bitmap", Toast.LENGTH_LONG).show();
 			} else {
 				// if (bitmap.getHeight() < bitmap.getWidth()) {
 				// bitmap = PicProcessor.rotatePic(bitmap);
@@ -250,16 +245,16 @@ public class PreviewAndPicture extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, 1, 1, "蒙");
+		menu.add(0, 1, 1, "Meng");
 
-		if (hasMeng) {
-			menu.add(0, 0, 0, "去蒙");
+        menu.add(0, 0, 0, "unmeng");
+
+        if (hasMeng) {
 		} else {
-			menu.add(0, 0, 0, "加蒙");
 			menu.getItem(1).setVisible(false);
 		}
-		menu.add(0, 2, 2, "存储路径");
-		menu.add(0, 3, 3, "切换镜头");
+		menu.add(0, 2, 2, "path");
+		menu.add(0, 3, 3, "switch");
 
 		mengMenu = menu.getItem(1);
 		return true;
@@ -272,30 +267,30 @@ public class PreviewAndPicture extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case 0:// 是否加蒙
+		case 0:	
 			if (hasMeng) {
 				mengImageView.setVisibility(View.INVISIBLE);
-				item.setTitle("加蒙");
+				item.setTitle("unmeng");
 			} else {
 				mengImageView.setVisibility(View.VISIBLE);
-				item.setTitle("去蒙");
+				item.setTitle("meng");
 			}
 			hasMeng = !hasMeng;
 			mengMenu.setVisible(hasMeng);
 
 			break;
-		case 1:// 选取图片蒙
+		case 1:
 			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 			intent.addCategory(Intent.CATEGORY_DEFAULT);
 			intent.setType("image/*");
 			startActivityForResult(intent, 0);
 			break;
-		case 2:// 设置图片保存路径
+		case 2:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("设置保存路径");
+			builder.setTitle("path");
 			final EditText pathText = new EditText(this);
 			builder.setView(pathText);
-			builder.setPositiveButton("确定",
+			builder.setPositiveButton("ok",
 					new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog, int which) {
@@ -306,11 +301,11 @@ public class PreviewAndPicture extends Activity {
 
 							} else {
 								Toast.makeText(PreviewAndPicture.this,
-										"请选择正确的目录", Toast.LENGTH_LONG).show();
+										"not a directory", Toast.LENGTH_LONG).show();
 							}
 						}
 					});
-			builder.setNegativeButton("取消", null);
+			builder.setNegativeButton("cancel", null);
 			builder.show();
 			break;
 		case 3:// picture
@@ -341,9 +336,8 @@ public class PreviewAndPicture extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.e(TAG, "onActivityResult");
 		switch (requestCode) {
-		case REQUEST_SELECT_PIC:// 选择图片返回
+		case REQUEST_SELECT_PIC:
 			if (resultCode == RESULT_OK && data != null) {
-				// 这里需要对照片做一些处理
 				// this.bitmap =
 				// MyApplication.getPic(MyApplication.mengPic);
 				// if (this.bitmap != null && !this.bitmap.isRecycled()) {
@@ -359,7 +353,7 @@ public class PreviewAndPicture extends Activity {
 				bitmap = null;
 
 				storePreference();
-			} else {// 如果没有选择图片，并且之前也没有图片，那就是没有蒙子呗
+			} else {
 				if (mengUri == null) {
 					hasMeng = false;
 				}
@@ -389,14 +383,11 @@ public class PreviewAndPicture extends Activity {
 			Log.e(TAG, "takepicture error");
 			e.printStackTrace();
 		}
-		// 提示保存位置
-		Toast.makeText(PreviewAndPicture.this, "已保存为" + fileName,
+		Toast.makeText(PreviewAndPicture.this, "锟窖憋拷锟斤拷为" + fileName,
 				Toast.LENGTH_LONG).show();
-		// 暂停，继续还没实现---------------？
 		// Canvas canvas=surfaceView.getHolder().lockCanvas();
 		// canvas.drawBitmap(bitmap, 0, 0,null);
 		// surfaceView.getHolder().unlockCanvasAndPost(canvas);
-		// 如果有meng赚到生成组的界面，否则继续预览
 	}
 
 }
