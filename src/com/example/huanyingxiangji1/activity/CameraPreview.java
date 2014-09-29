@@ -40,6 +40,8 @@ public class CameraPreview extends SurfaceView implements
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	}
 
+
+
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		Log.e(TAG, "surfaceChanged");
@@ -54,6 +56,7 @@ public class CameraPreview extends SurfaceView implements
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		mCamera.startPreview();
 	}
 
@@ -63,9 +66,11 @@ public class CameraPreview extends SurfaceView implements
 		int width = wm.getDefaultDisplay().getWidth();
 		int height = wm.getDefaultDisplay().getHeight();
 		if (mCamera != null) {
-			mSupportedPreviewSizes = mCamera.getParameters()
+			mSupportedPreviewSizes =
+                    mCamera.getParameters()
 					.getSupportedPreviewSizes();
-			mSupportedPictureSizes = mCamera.getParameters()
+			mSupportedPictureSizes =
+                    mCamera.getParameters()
 					.getSupportedPictureSizes();
 		}
 		//TODO the implement need to change a little, now I just exchange the two param

@@ -1,20 +1,33 @@
 buildscript {
     repositories {
-        mavenCentral()
+//		maven { url 'http://maven.oschina.net/content/groups/public/' }
+
+//        mavenCentral()
+        jcenter()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.8.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
+
 apply plugin: 'android'
+apply plugin: 'maven'
+
+repositories {
+	maven{
+			url "file:///home/jinux/.m2/repository"
+		}
+	jcenter()
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    compileSdkVersion 20
+    buildToolsVersion "20.0.0"
 
     sourceSets {
         main {
