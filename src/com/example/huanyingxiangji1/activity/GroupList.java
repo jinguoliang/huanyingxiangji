@@ -11,6 +11,8 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -19,11 +21,14 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleAdapter.ViewBinder;
@@ -34,6 +39,7 @@ import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.processor.SomeTool;
+import com.example.huanyingxiangji1.utils.LogHelper;
 
 public class GroupList extends ListActivity implements OnItemClickListener {
 	private static final String TAG = GroupList.class.getName();
@@ -41,7 +47,6 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 	private static final int CREATE_GROUP = 1;
 	private static final int ADD_NEW_PICTURE = 2;
 	
-	String tag = "GroupList";
 	List<Map<String, Object>> list;
 	MyApplication application;
 	FileProcessor fileProcessor;
@@ -59,7 +64,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.group_list);
 		application = (MyApplication) getApplication();
-		AbsListView l;
+
 		list = getData();
 		SimpleAdapter adapter = new SimpleAdapter(this, list,
 				R.layout.group_list_item, new String[] { "groupName",
@@ -71,8 +76,15 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			public boolean setViewValue(View view, Object data,
 					String textRepresentation) {
 				if (view instanceof ImageView) {
-					((ImageView) view).setImageBitmap((Bitmap) data);
-					Log.e(tag, textRepresentation);
+                    final ImageView iv = (ImageView) view;
+                    iv.setImageBitmap((Bitmap) data);
+                    iv.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                        @Override
+                        public boolean onPreDraw() {
+                            adjustImageViewHeight(iv, 1080, 1920);
+                            return true;
+                        }
+                    });
 					return true;
 				}
 				return false;
@@ -83,6 +95,19 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		getListView().setOnItemClickListener(this);
 
 	}
+
+    private void adjustImageViewHeight(ImageView view, int width, int height) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        int bitmapWidth = width;
+        int bitmapHeight = height;
+        LogHelper.i(TAG, "the bitmap size (" + bitmapWidth + ", " + bitmapHeight + ")");
+        LogHelper.i(TAG, "the view size (" + params.width + ", " + params.height + ")");
+        int viewWidth = view.getWidth();
+        LogHelper.i(TAG, "the view size (" + view.getWidth() + ", " + view.getHeight() + ")");
+
+        params.height = (int) (bitmapHeight * (float)viewWidth / bitmapWidth);
+        view.setLayoutParams(params);
+    }
 
 	private List<Map<String, Object>> getData() {
 		List<Map<String, Object>> list;
@@ -104,9 +129,12 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			List<String> filePaths = fileProcessor.getGroup(groupName);
 			for (int i = 0; i < filePaths.size(); i++) {
 				String picPath = filePaths.get(i);
-				Log.e(tag, picPath);
-				map.put("preview" + i, BitmapFactory.decodeFile(picPath));
-				if (i == 3) {
+                try {
+                    map.put("preview" + i, PicProcessor.getBitmapFromUri(getBaseContext(), Uri.fromFile(new File(picPath)), PicProcessor.SCALE_SMALL));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (i == 3) {
 					break;
 				}
 			}
@@ -142,12 +170,10 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		mCurrentGroupName = (String) map.get("groupName");
 		switch (item.getItemId()) {
 		case R.id.newGroup:
-			Log.e(tag, "new");
 			Intent i = new Intent(this, CreateNewGroup.class);
 			startActivityForResult(i, CREATE_GROUP);
 			return true;
 		case R.id.deleteGroup:
-			Log.e(tag, "del");
 			fileProcessor.removeGroup(mCurrentGroupName, false);
 			list.remove(id);
 			((BaseAdapter) getListAdapter()).notifyDataSetChanged();
@@ -232,7 +258,6 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 			List<String> filePaths = fileProcessor.getGroup(groupName);
 			for (int i = 0; i < filePaths.size(); i++) {
 				String picPath = filePaths.get(i);
-				Log.e(tag, picPath);
 				map.put("preview" + i, BitmapFactory.decodeFile(picPath));
 				if (i == 3) {
 					break;

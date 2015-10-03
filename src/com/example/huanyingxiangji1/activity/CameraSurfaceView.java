@@ -3,53 +3,51 @@ package com.example.huanyingxiangji1.activity;
 import java.io.IOException;
 import java.util.List;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import com.example.huanyingxiangji1.utils.LogHelper;
+
 /** A basic Camera preview class */
-public class CameraPreview extends SurfaceView implements
+public class CameraSurfaceView extends SurfaceView implements
 		SurfaceHolder.Callback {
+	String TAG = CameraSurfaceView.class.getSimpleName();
+
 	private Camera mCamera;
-	String TAG = "CameraPreview";
 	private SurfaceHolder mHolder;
 	private List<Size> mSupportedPreviewSizes;
 	private Size mPreviewSize;
-	private Context mContext;
 	private List<Size> mSupportedPictureSizes;
 	private Size mPictureSize;
 
-	public CameraPreview(Context context, Camera camera) {
+	public CameraSurfaceView(Context context) {
 		super(context);
-
-		this.mContext = context;
-		mCamera = camera;
-
-		configCamera();
-
-		mHolder = getHolder();
-		mHolder.addCallback(this);
-
-		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		initView();
 	}
 
+    public CameraSurfaceView(Context context,  AttributeSet set) {
+        super(context, set);
+        initView();
+    }
+
+    private void initView() {
+        mHolder = getHolder();
+        mHolder.addCallback(this);
+    }
 
 
+	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		Log.e(TAG, "surfaceChanged");
 		mHolder = holder;
-		Log.e(TAG, "surface width=" + width + ",height=" + height);
+		LogHelper.i(TAG, "surface width=" + width + ",height=" + height);
 		mCamera.stopPreview();
-
-		configCamera();
 
 		try {
 			mCamera.setPreviewDisplay(holder);
@@ -61,7 +59,7 @@ public class CameraPreview extends SurfaceView implements
 	}
 
 	private void configCamera() {
-		WindowManager wm = (WindowManager) mContext
+		WindowManager wm = (WindowManager) getContext()
 				.getSystemService(Context.WINDOW_SERVICE);
 		int width = wm.getDefaultDisplay().getWidth();
 		int height = wm.getDefaultDisplay().getHeight();
@@ -78,14 +76,13 @@ public class CameraPreview extends SurfaceView implements
 				width);
 		mPictureSize = getOptimalPreviewSize(mSupportedPictureSizes, height,
 				width);
+        LogHelper.i(TAG, "the select preview size (" + mPreviewSize.width + "," + mPreviewSize.height +")");
+        LogHelper.i(TAG, "the select picture size (" + mPictureSize.width + "," + mPictureSize.height +")");
 		Camera.Parameters parameters = mCamera.getParameters();
 		parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
 		parameters.setPictureSize(mPictureSize.width, mPictureSize.height);
-
-		
 		mCamera.setParameters(parameters);
 		mCamera.setDisplayOrientation(90);
-
 	}
 
 	private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
@@ -123,23 +120,12 @@ public class CameraPreview extends SurfaceView implements
 		return optimalSize;
 	}
 
+	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		Log.e(TAG, "surfaceCreated");
 		mHolder = holder;
-
 	}
 
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.e(TAG, "surfaceDestroyed");
-	}
-
-	@SuppressLint("NewApi")
-	public void setCamera(Camera c) {
-		Log.e(TAG, "setCamera");
-
-		mCamera.stopPreview();
-		mCamera.release();
-		
+	public void changeCamera(Camera c) {
 		mCamera = c;
 
 		configCamera();
@@ -152,4 +138,8 @@ public class CameraPreview extends SurfaceView implements
 		mCamera.startPreview();
 	}
 
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		//TODO
+	}
 }

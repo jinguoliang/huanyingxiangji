@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.example.huanyingxiangji1.activity.CameraSurfaceView
+        android:id="@+id/cameraSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <com.example.huanyingxiangji1.activity.MengView
+        android:id="@+id/mengView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <!-- controller -->
+    <Button
+        android:id="@+id/pictureBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/picture"
+        android:onClick="pictureButtonClick"
+        android:layout_gravity="center_horizontal|bottom"/>
+    <CheckBox
+        android:id="@+id/mengCb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/open_meng"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="50dp"
+        android:onClick="onMengCbClick"
+        />
+    <Button
+        android:id="@+id/mengPathBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_meng"
+        android:layout_gravity="bottom"
+        android:onClick="onSelectMengBtnClick"
+        android:enabled="false"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/savePathBtn"
+        android:text="@string/save_path"
+        android:layout_gravity="bottom|right"
+        android:onClick="savePathBtnClick"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switchCameraBtn"
+        android:text="@string/switch_camera"
+        android:layout_gravity="right"
+        android:onClick="switchCameraButtonClick"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/backBtn"
+        android:text="@string/back"
+        android:onClick="onBackClick"/>
+
+    <SeekBar
+        style="@android:style/Widget.DeviceDefault.SeekBar"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/mengAlphaSb"
+        android:max="250"
+        android:rotation="-90"
+        android:layout_marginRight="-80dp"
+        android:layout_gravity="right|center_vertical" />
+
+</FrameLayout>

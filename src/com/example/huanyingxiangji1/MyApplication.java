@@ -7,6 +7,8 @@ import android.app.Application;
 import android.graphics.Bitmap;
 
 public class MyApplication extends Application {
+	public static MyApplication APP;
+
 	final public static String APP_SD_DIR="/huanyingxiangji/"; //the root of application
 	final public static String GROUP_DIR="group/";
 	final public static String TMP_DIR="tmp/";	
@@ -19,6 +21,7 @@ public class MyApplication extends Application {
 	public  static String newPicPath=""; 
 	
 	private static Map<String, Bitmap>picMap=new HashMap<String, Bitmap>();
+
 	public static Bitmap getPic(String picName) {
 		synchronized (picMap) {
 			return picMap.get(picName);
@@ -29,6 +32,10 @@ public class MyApplication extends Application {
 			MyApplication.picMap.put(picName, b);
 		}
 	}
-	
 
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		APP = this;
+	}
 }

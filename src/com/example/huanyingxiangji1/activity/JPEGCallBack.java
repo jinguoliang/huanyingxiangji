@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.processor.PicProcessor;
+import com.example.huanyingxiangji1.utils.LogHelper;
 
 
 public class JPEGCallBack implements PictureCallback {
@@ -29,16 +30,10 @@ public class JPEGCallBack implements PictureCallback {
 	
 	public void onPictureTaken(byte[] data, Camera camera) {
 	
-		Log.e(TAG,"wawa");
-		Message m=Message.obtain();
-		m.what=1;
-
 		Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-		 mHandler.sendMessage(m);
+		LogHelper.i(TAG, "the size of the picture just taken is (" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
+		mHandler.sendMessage(mHandler.obtainMessage(PreviewAndPicture.MSG_PICTURE));
 
-		
-		Log.e(TAG,"haha");
-		
 		MyApplication.putPic("newPic", bitmap);
 		try {
 			bitmap=PicProcessor.rotatePic(bitmap);

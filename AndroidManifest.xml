@@ -4,13 +4,14 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="14" />
+        android:minSdkVersion="18"
+        android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.front" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
@@ -34,12 +35,13 @@
             android:name=".activity.PreviewAndPicture"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.DeviceDefault" >
+            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar.Overscan" >
         </activity>
         <!-- picture Group -->
         <activity
             android:name=".activity.GroupList"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main"
+            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar">
         </activity>
         <!-- picture view -->
         <activity
@@ -49,7 +51,8 @@
         <!-- create new Group -->
         <activity
             android:name=".activity.CreateNewGroup"
-            android:label="@string/title_activity_main">
+            android:label="@string/title_activity_main"
+            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar">
         </activity>
        <activity
             android:name=".activity.WorkSetActivity"

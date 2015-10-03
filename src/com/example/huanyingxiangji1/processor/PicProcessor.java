@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.example.huanyingxiangji1.gif.GifEncoder;
+import com.example.huanyingxiangji1.utils.LogHelper;
 
 //import com.example.huanyingxiangji1.thirdpart.AnimatedGifEncoder;
 
@@ -57,7 +58,9 @@ public class PicProcessor {
 
 	static public void storePic(Bitmap bitmap, String picPath)
 			throws IOException {
-		File file = new File(picPath);
+        LogHelper.i(TAG, "the size of the picture to be writen is (" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
+
+        File file = new File(picPath);
 		BufferedOutputStream out = new BufferedOutputStream(
 				new FileOutputStream(file));
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
@@ -196,4 +199,8 @@ public class PicProcessor {
 		return result;
 	}
 
+    public class Size {
+        public int width;
+        public int height;
+    }
 }

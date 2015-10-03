@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
@@ -23,6 +24,10 @@ public class MengView extends ImageView {
 	public MengView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
+	}
+
+	public MengView(Context context, AttributeSet attrs) {
+		super(context, attrs);
 	}
 
 	@Override
@@ -59,7 +64,7 @@ public class MengView extends ImageView {
 			return true;
 		case MotionEvent.ACTION_MOVE:
 			if (touchCount == 1) { // on pointer move
-				processOneTouch(x - ox, y - oy);
+				//processOneTouch(x - ox, y - oy);
 			} else if (touchCount == 2) { // two pointer move
 
 				float x1 = event.getX(1);
