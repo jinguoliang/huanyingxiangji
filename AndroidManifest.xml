@@ -41,7 +41,7 @@
         <activity
             android:name=".activity.GroupList"
             android:label="@string/title_activity_main"
-            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar">
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
         </activity>
         <!-- picture view -->
         <activity

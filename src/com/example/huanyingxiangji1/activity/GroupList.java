@@ -123,7 +123,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		List<String> groupNames = fileProcessor.getAllGroupName();
 		for (Iterator<String> iterator = groupNames.iterator(); iterator
 				.hasNext();) {
-			String groupName = (String) iterator.next();
+			String groupName = iterator.next();
 			map = new HashMap<String, Object>();
 			map.put("groupName", groupName);
 			List<String> filePaths = fileProcessor.getGroup(groupName);
