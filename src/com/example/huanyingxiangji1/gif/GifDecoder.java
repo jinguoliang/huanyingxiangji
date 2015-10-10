@@ -64,7 +64,7 @@ public class GifDecoder extends Thread {
 
     // last graphic control extension info
     private int dispose=0;
-    // 0=no action; 1=leave in place; 2=restore to bg; 3=restore to prev
+    // 0=no mCallBack; 1=leave in place; 2=restore to bg; 3=restore to prev
     private int lastDispose=0;
     private boolean transparency=false; // use transparent color
     private int delay=0; // delay in milliseconds
@@ -82,22 +82,22 @@ public class GifDecoder extends Thread {
     //private GifFrame gifFrame; // frames read from current file
     private int frameCount;
 
-    private GifAction action=null;
+    private GifCallback mCallBack =null;
     ArrayList<GifFrame> frame2ArrayList;
 
     public ArrayList<GifFrame> getFrameArrayList() {
         return frame2ArrayList;
     }
 
-    public GifDecoder(byte[] data, GifAction act) {
+    public GifDecoder(byte[] data, GifCallback callback) {
         gifData=data;
-        action=act;
+        mCallBack =callback;
         frame2ArrayList=new ArrayList<GifFrame>();
     }
 
-    public GifDecoder(InputStream is, GifAction act) {
+    public GifDecoder(InputStream is, GifCallback callback) {
         in=is;
-        action=act;
+        mCallBack =callback;
         frame2ArrayList=new ArrayList<GifFrame>();
     }
 
@@ -120,7 +120,6 @@ public class GifDecoder extends Thread {
 
     @Override
     public void run() {
-        Log.d(TAG, "run.");
         if (in!=null) {
             readStream();
         } else if (gifData!=null) {
@@ -255,15 +254,15 @@ public class GifDecoder extends Thread {
                 if (frameCount<0) {
                     status=STATUS_FORMAT_ERROR; 
                     Log.d(TAG, "readContents");
-                    action.parseOk(false, -1);
+                    mCallBack.parseOk(false, -1);
                 } else {
                     status=STATUS_FINISH;
                     Log.d(TAG, "frame2ArrayList ?"+(frame2ArrayList==null?0:frame2ArrayList.size()));
-                    action.parseOk(true, -1);
+                    mCallBack.parseOk(true, -1);
                 }
             } else {
                 Log.d(TAG, "readHeader");
-                action.parseOk(false, -1);
+                mCallBack.parseOk(false, -1);
             }
 
             try {
@@ -276,7 +275,7 @@ public class GifDecoder extends Thread {
         } else {
             status=STATUS_OPEN_ERROR;
             Log.d(TAG, "encounter error");
-            action.parseOk(false, -1);
+            mCallBack.parseOk(false, -1);
         }
         return status;
     }
@@ -603,7 +602,7 @@ public class GifDecoder extends Thread {
             act[transIndex]=save;
         }
         resetFrame();
-        //action.parseOk(true,frameCount);    
+        //mCallBack.parseOk(true,frameCount);
     }
 
     private void readLSD() {

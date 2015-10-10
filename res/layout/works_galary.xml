@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/works_grid"
-    android:layout_width="match_parent"
+<com.example.huanyingxiangji1.view.AdvancedGallary
+    android:id="@+id/worksGallary"
     android:layout_height="match_parent"
-    android:background="#fff000"
-    android:columnWidth="100dp"
-    android:gravity="center"
-    android:horizontalSpacing="10dp"
+    android:layout_width="match_parent"
     android:numColumns="3"
-    android:padding="10dp"
     android:stretchMode="columnWidth"
-    android:verticalSpacing="10dp" />
+    android:choiceMode="multipleChoice"
+    android:drawSelectorOnTop="false"
+    android:background="#619ad7"
+    xmlns:android="http://schemas.android.com/apk/res/android" />

@@ -1,7 +1,11 @@
 package com.example.huanyingxiangji1.activity;
 
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.DriverPropertyInfo;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,28 +32,32 @@ import com.example.huanyingxiangji1.gif.GifView;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.SomeTool;
 import com.example.huanyingxiangji1.processor.SomeTool.FileType;
+import com.example.huanyingxiangji1.utils.LogHelper;
+import com.example.huanyingxiangji1.view.AdvancedGallary;
 
-@SuppressLint("NewApi")
 public class WorkSetActivity extends Activity implements
 		LoaderCallbacks<List<ImageData>> {
-	public static final String TAG = WorkSetActivity.class.getCanonicalName();
-	private GridView mGallery;
+	public static final String TAG = WorkSetActivity.class.getSimpleName();
+    public static final int LOADER_ID = 0;
+
+    private AdvancedGallary mGallery;
 	public List<ImageData> mWorks;
 	private WorksAdapter mAdapter;
+
 	private Handler mHandler = new Handler() {
 		public void dispatchMessage(android.os.Message msg) {
 			mGallery.setAdapter(mAdapter);
 			mAdapter.notifyDataSetChanged();
-		};
+		}
 	};
-	   private Handler gifHandler=new Handler() {
+    //因为构造 gifView 的时候在 workthread 里，所以需要传一个在 ui 线程的 handler
+   private Handler gifHandler=new Handler() {
 
-	        @Override
-	        public void handleMessage(Message msg) {
-	        	((View)(msg.obj)).invalidate();
-	            Log.e(TAG,"invalidate redraw");
-	        }
-	    };
+        @Override
+        public void handleMessage(Message msg) {
+            ((View)(msg.obj)).invalidate();
+        }
+   };
 	
 	static class ImageData {
 		FileType mType;
@@ -62,53 +70,16 @@ public class WorkSetActivity extends Activity implements
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.works_galary);
 
-		mGallery = (GridView) findViewById(R.id.works_grid);
+		mGallery = (AdvancedGallary) findViewById(R.id.worksGallary);
 		mAdapter = new WorksAdapter();
 
 		setListShown(false);
-		
-//		List<ImageData> list = new ArrayList<ImageData>();
-//		for (String path : FileProcessor.getWorksPaths()) {
-//			Log.e(TAG, "path: " + path);
-//			FileType fileType = SomeTool.getFileType(path);
-//			if (fileType == SomeTool.FileType.GIF) {
-//				GifView gifView = new GifView(this);
-//				gifView.setGifImageType(GifView.GifImageType.ANIMATION);
-//
-//				try {
-//
-//					gifView.setGifImage(new FileInputStream(path));
-//					/*
-//					 * FileInputStream fileInputStream=new
-//					 * FileInputStream(file); byte[] bytes=new
-//					 * byte[fileInputStream.available()];
-//					 * fileInputStream.read(bytes); gf2.setGifImage(bytes);
-//					 */
-//					// gf2.setOnClickListener(this);
-//					list.add(new ImageData(FileType.GIF, gifView));
-//				} catch (IOException e) {
-//					Log.e(TAG, "hello");
-//					e.printStackTrace();
-//				}
-//			} else if (fileType == SomeTool.FileType.JPG) {
-//				ImageView iv = new ImageView(this);
-//				iv.setImageBitmap(BitmapFactory.decodeFile(path));
-//				list.add(new ImageData(FileType.JPG, iv));
-//			} else {
-//			}
-//		}
-//		mWorks=list;
-//		mGallery.setAdapter(mAdapter);
-//		setListShown(true);
-//		mAdapter.notifyDataSetInvalidated();
-		
 		// Prepare the loader. Either re-connect with an existing one,
 		// or start a new one.
-		getLoaderManager().initLoader(0, null, this);
+		getLoaderManager().initLoader(LOADER_ID, null, this);
 	}
 
 	public class WorksAdapter extends BaseAdapter {
@@ -141,7 +112,6 @@ public class WorkSetActivity extends Activity implements
 
 	@Override
 	public Loader<List<ImageData>> onCreateLoader(int id, Bundle args) {
-		// TODO Auto-generated method stub
 		return new WorksLoader(WorkSetActivity.this,
 				FileProcessor.getWorksPaths(),gifHandler);
 	}
@@ -149,7 +119,6 @@ public class WorkSetActivity extends Activity implements
 	@Override
 	public void onLoadFinished(Loader<List<ImageData>> loader, List<ImageData> data) {
 		mAdapter.setData(data);
-		Log.e(TAG, "onLoadFinished");
 		// The list should now be shown.
 		mGallery.setAdapter(mAdapter);
 		setListShown(true);
@@ -171,29 +140,25 @@ public class WorkSetActivity extends Activity implements
 }
 
 /**
- * A custom Loader that loads all of the installed applications.
+ * A custom Loader that loads all of the works.
  */
-@SuppressLint("NewApi")
 class WorksLoader extends AsyncTaskLoader<List<WorkSetActivity.ImageData>> {
 
-	private static final String TAG = WorksLoader.class.getCanonicalName();
+	private static final String TAG = WorksLoader.class.getSimpleName();
 	List<WorkSetActivity.ImageData> mWorks;
 	private ArrayList<String> mWorkPaths;
 	private Context mContext;
 	private Handler mHandler;
 
-	@SuppressLint("NewApi")
 	public WorksLoader(Context context, ArrayList<String> paths, Handler h) {
 		super(context);
 		this.mContext = context;
 		this.mWorkPaths = paths;
 		this.mHandler=h;
-
 	}
 
 	private List<WorkSetActivity.ImageData> loadWorksView(List<String> imagePaths) {
-		Log.e(TAG,"imagePaths: "+imagePaths);
-		Log.e(TAG, "loadWorksView");
+		Log.e(TAG, "imagePaths: " + imagePaths);
 		
 		List<WorkSetActivity.ImageData> list = new ArrayList<WorkSetActivity.ImageData>();
 		for (String path : imagePaths) {
@@ -249,27 +214,12 @@ class WorksLoader extends AsyncTaskLoader<List<WorkSetActivity.ImageData>> {
 	 */
 	@Override
 	public void deliverResult(List<WorkSetActivity.ImageData> works) {
-		if (isReset()) {
-			// An async query came in while the loader is stopped. We
-			// don't need the result.
-			if (works != null) {
-				onReleaseResources(works);
-			}
-		}
-		List<WorkSetActivity.ImageData> oldWorks = works;
 		mWorks = works;
 
 		if (isStarted()) {
 			// If the Loader is currently started, we can immediately
 			// deliver its results.
 			super.deliverResult(works);
-		}
-
-		// At this point we can release the resources associated with
-		// 'oldApps' if needed; now that the new result is delivered we
-		// know that it is no longer in use.
-		if (oldWorks != null) {
-			onReleaseResources(oldWorks);
 		}
 	}
 
@@ -301,19 +251,6 @@ class WorksLoader extends AsyncTaskLoader<List<WorkSetActivity.ImageData>> {
 	}
 
 	/**
-	 * Handles a request to cancel a load.
-	 */
-	@Override
-	public void onCanceled(List<WorkSetActivity.ImageData> apps) {
-		super.onCanceled(apps);
-
-		// At this point we can release the resources associated with
-		// 'mWorks'
-		// if needed.
-		onReleaseResources(apps);
-	}
-
-	/**
 	 * Handles a request to completely reset the Loader.
 	 */
 	@Override
@@ -327,18 +264,8 @@ class WorksLoader extends AsyncTaskLoader<List<WorkSetActivity.ImageData>> {
 		// 'mWorks'
 		// if needed.
 		if (mWorks != null) {
-			onReleaseResources(mWorks);
 			mWorks = null;
 		}
 
-	}
-
-	/**
-	 * Helper function to take care of releasing resources associated with an
-	 * actively loaded data set.
-	 */
-	protected void onReleaseResources(List<WorkSetActivity.ImageData> apps) {
-		// For a simple List<> there is nothing to do. For something
-		// like a Cursor, we would close it here.
 	}
 }

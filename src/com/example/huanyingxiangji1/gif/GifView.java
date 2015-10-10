@@ -15,8 +15,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.example.huanyingxiangji1.utils.LogHelper;
 
-public class GifView extends View implements GifAction {
+
+public class GifView extends View implements GifCallback {
 
     public static final String TAG="GifView";
 
@@ -71,7 +73,7 @@ public class GifView extends View implements GifAction {
         mHandler=new Handler(){
         	public void dispatchMessage(Message msg) {
         		invalidate();
-        	};
+        	}
         };
     }
     
@@ -107,7 +109,6 @@ public class GifView extends View implements GifAction {
 
 
     private void setGifDecoderImage(InputStream is) {
-        Log.d(TAG, "setGifDecoderImage.");
         if (gifDecoder!=null) {
             gifDecoder.free();
             gifDecoder=null;
@@ -182,7 +183,6 @@ public class GifView extends View implements GifAction {
             w=1;
             h=1;
         } else {
-        	
             w=gifDecoder.width;
             h=gifDecoder.height;
             Log.e(TAG,"("+w+", "+h+")");
@@ -198,12 +198,10 @@ public class GifView extends View implements GifAction {
         heightSize=resolveSize(h, heightMeasureSpec);
 
         Log.d(TAG, "widthSize:"+widthSize+" heightSize:"+heightSize+" w:"+w+" h:"+h);
-        heightSize=400;
         setMeasuredDimension(widthSize, heightSize);
     }
 
     public void showCover() {
-        Log.d(TAG, "showCover.");
         if (gifFrames==null||frameLength<1) {
             return;
         }
@@ -236,7 +234,7 @@ public class GifView extends View implements GifAction {
 
 
     public void setGifImageType(GifImageType type) {
-        if (gifDecoder==null) {
+        if (gifDecoder!=null) {
             animationType=type;
         }
     }
@@ -252,6 +250,7 @@ public class GifView extends View implements GifAction {
             rect.top=0;
             rect.right=width;
             rect.bottom=height;
+            measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
             requestLayout();
             invalidate();
         }
@@ -300,7 +299,6 @@ public class GifView extends View implements GifAction {
         });
         //}
         gifDecoder.free();
-        gifDecoder=null;
 
         System.gc();
 
@@ -410,7 +408,7 @@ public class GifView extends View implements GifAction {
                 }
 
                 currentImage=frame.image;
-                if (pause==false) {
+                if (pause == false) {
                     long delay=frame.delay;
                     Log.d(TAG, "run.currentImage:"+currentImage+" pause:"+pause+" isRun:"+isRun+" delay:"+delay);
                     Message msg=mHandler.obtainMessage();

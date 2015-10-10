@@ -56,7 +56,8 @@
         </activity>
        <activity
             android:name=".activity.WorkSetActivity"
-            android:label="@string/title_activity_main">
+            android:label="@string/title_activity_main"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
       </activity>
         
         
