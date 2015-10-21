@@ -53,7 +53,7 @@ public class PreviewAndPicture extends Activity {
     private SeekBar mMengAlphaSb;
 
     private static Camera mCamera;
-    private int mWhichCamera = CameraHelper.CAMERA_BACK;
+    public static int mWhichCamera = CameraHelper.CAMERA_BACK;
     private String mSavePath;
     private boolean mHasMeng;
     private Uri mMengUri;

@@ -5,11 +5,10 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.processor.PicProcessor;
+import com.example.huanyingxiangji1.utils.CameraHelper;
 import com.example.huanyingxiangji1.utils.LogHelper;
 
 
@@ -36,8 +35,12 @@ public class JPEGCallBack implements PictureCallback {
 
 		MyApplication.putPic("newPic", bitmap);
 		try {
-			bitmap=PicProcessor.rotatePic(bitmap);
-			bitmap=PicProcessor.turnPicture(bitmap);
+			if (PreviewAndPicture.mWhichCamera == CameraHelper.CAMERA_FRONT) {
+				bitmap = PicProcessor.rotatePic(bitmap, -90);
+				bitmap = PicProcessor.turnPicture(bitmap);
+			}else {
+				bitmap = PicProcessor.rotatePic(bitmap, 90);
+			}
 			MyApplication.newPicPath=path;
 			PicProcessor.storePic(bitmap, path);
 		} catch (Exception e) {

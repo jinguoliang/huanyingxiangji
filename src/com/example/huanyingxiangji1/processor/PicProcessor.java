@@ -1,13 +1,5 @@
 package com.example.huanyingxiangji1.processor;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +13,14 @@ import android.util.Log;
 
 import com.example.huanyingxiangji1.gif.GifEncoder;
 import com.example.huanyingxiangji1.utils.LogHelper;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 //import com.example.huanyingxiangji1.thirdpart.AnimatedGifEncoder;
 
@@ -68,13 +68,13 @@ public class PicProcessor {
 		out.close();
 	}
 
-	static public Bitmap rotatePic(Bitmap bitmap) {
+	static public Bitmap rotatePic(Bitmap bitmap, int angle) {
 		// Log.e("imageview","width:"+mengImageView.getWidth()+" : height: "+mengImageView.getHeight());
 		// Log.e("surface","width:"+surfaceView.getWidth()+" : height: "+surfaceView.getHeight());
 		// Log.e("bitmap","width:"+bitmap.getWidth()+" : height: "+bitmap.getHeight());
 		Matrix matrix = new Matrix();
 		matrix.reset();
-		matrix.setRotate(-90);
+		matrix.setRotate(angle);
 		Bitmap tmp = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
 				bitmap.getHeight(), matrix, true);
 		bitmap.recycle();
