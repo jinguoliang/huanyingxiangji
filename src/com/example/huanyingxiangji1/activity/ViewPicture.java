@@ -1,11 +1,8 @@
 package com.example.huanyingxiangji1.activity;
 
-import java.util.ArrayList;
-
 import android.annotation.SuppressLint;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -20,9 +17,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
+
+import java.util.ArrayList;
 
 @SuppressLint("ValidFragment")
 public class ViewPicture extends FragmentActivity {
@@ -37,9 +35,7 @@ public class ViewPicture extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.pic_view);
 		String groupName = getIntent().getStringExtra("groupName");
-		String dataDir = Environment.getExternalStorageDirectory()
-				.getAbsolutePath() + "/" + MyApplication.APP_SD_DIR;
-		FileProcessor processor = new FileProcessor(dataDir);
+		FileProcessor processor = new FileProcessor();
 		ArrayList<String> list = processor.getGroup(groupName);
 		ViewPager vp = (ViewPager) findViewById(R.id.gallary);
 		vp.setAdapter(new FragmentPager(this, list));

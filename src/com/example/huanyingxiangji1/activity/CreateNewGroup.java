@@ -106,9 +106,7 @@ public class CreateNewGroup extends Activity implements OnClickListener {
 
 
 	private void finishCreateNewGroup() {
-		String path = Environment.getExternalStorageDirectory()
-				+ MyApplication.APP_SD_DIR;
-		FileProcessor processor = new FileProcessor(path);
+		FileProcessor processor = new FileProcessor();
 		String groupName = groupNameText.getText().toString();
 		Uri uri;
 		try {

@@ -1,20 +1,11 @@
 package com.example.huanyingxiangji1.activity;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -23,12 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleAdapter.ViewBinder;
@@ -38,8 +27,14 @@ import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
-import com.example.huanyingxiangji1.processor.SomeTool;
 import com.example.huanyingxiangji1.utils.LogHelper;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class GroupList extends ListActivity implements OnItemClickListener {
 	private static final String TAG = GroupList.class.getName();
@@ -52,8 +47,6 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 	FileProcessor fileProcessor;
 	PicProcessor picProcessor;
 	private String mCurrentGroupName;
-	private String dataDir;
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -114,10 +107,7 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 		Map<String, Object> map;
 
 		FileProcessor.checkDirs();
-
-		dataDir = Environment.getExternalStorageDirectory().getAbsolutePath()
-				+ "/" + application.APP_SD_DIR;
-		fileProcessor = new FileProcessor(dataDir);
+		fileProcessor = new FileProcessor();
 
 		list = new ArrayList<Map<String, Object>>();
 		List<String> groupNames = fileProcessor.getAllGroupName();

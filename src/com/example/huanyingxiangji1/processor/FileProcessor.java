@@ -25,16 +25,8 @@ public class FileProcessor {
 
 	final String tag = "FileProcessor";
 
-	String groupDirName = MyApplication.GROUP_DIR;
-	String tmpDirName = MyApplication.TMP_DIR;
-
-	String groupDirFullPath;
-	String tmpDirFullPath;
-
-	public FileProcessor(String storeDirName) {
-		groupDirFullPath = storeDirName + groupDirName;
-		tmpDirFullPath = storeDirName + tmpDirName;
-	}
+	String groupDirFullPath = MyApplication.group_path;
+	String tmpDirFullPath = MyApplication.tmp_path;
 
 	public ArrayList<String> getGroup(String parent, String groupName) {
 		ArrayList<String> list = new ArrayList<String>();
