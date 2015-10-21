@@ -284,7 +284,7 @@ public class PreviewAndPicture extends Activity {
      * @param v
      */
     public void pictureButtonClick(View v) {
-        fileName = SomeTool.genPicPathName(mSavePath);
+        fileName = SomeTool.genPicPathName(MyApplication.pic_path);
         JPEGCallBack jpegCallBack = new JPEGCallBack(mHandler);
         jpegCallBack.setPath(fileName);
 
@@ -329,7 +329,7 @@ public class PreviewAndPicture extends Activity {
     public void onSelectMengBtnClick(View view) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setType("image/*");
+        intent.setDataAndType(Uri.fromFile(new File(MyApplication.pic_path)), "image/*");
         startActivityForResult(intent, REQUEST_SELECT_PIC);
     }
 

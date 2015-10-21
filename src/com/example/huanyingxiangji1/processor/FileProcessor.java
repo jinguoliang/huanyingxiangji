@@ -1,6 +1,14 @@
 package com.example.huanyingxiangji1.processor;
 
-import java.io.BufferedOutputStream;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore.Images.Media;
+import android.util.Log;
+
+import com.example.huanyingxiangji1.MyApplication;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,15 +19,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore.Images.Media;
-import android.util.Log;
-
-import com.example.huanyingxiangji1.MyApplication;
 
 public class FileProcessor {
 	private static final String TAG = FileProcessor.class.getName();
@@ -222,18 +221,14 @@ public class FileProcessor {
 		copyFile(in, out);
 	}
 	
-	public static String getSDPath(String path){
-		return "/sdcard/"+path;
-	}
-
 	public static ArrayList<String> getWorksPaths() {
 		ArrayList<String>list=new ArrayList<String>();
-		File dir = new File(getSDPath(MyApplication.out_path));
+		File dir = new File(MyApplication.out_path);
 		Log.e(TAG,"dir = "+dir.toString());
 		if (dir.exists() && dir.isDirectory()) {
 			for (String f : dir.list()) {
 				Log.e(TAG,"f = " + f);
-				list.add(getSDPath(MyApplication.out_path+f));
+				list.add(MyApplication.out_path+f);
 				
 			}
 		}
@@ -254,12 +249,12 @@ public class FileProcessor {
 		Log.d(TAG,"check Dirs");
 		if (checkMedia()) {
 			Log.d(TAG,"check Media finish");
-			String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-			checkDir(sdcardPath + MyApplication.APP_SD_DIR);
-			Log.d(TAG,"group_path = "+MyApplication.group_path);
-			checkDir(sdcardPath +MyApplication.group_path);
-			checkDir(sdcardPath +MyApplication.tmp_path);
-			checkDir(sdcardPath +MyApplication.out_path);
+			checkDir(MyApplication.APP_SD_DIR);
+			Log.d(TAG, "group_path = " + MyApplication.group_path);
+			checkDir(MyApplication.group_path);
+			checkDir(MyApplication.tmp_path);
+			checkDir(MyApplication.out_path);
+			checkDir(MyApplication.pic_path);
 		}
 		else{
 			Log.e(TAG,"media card is not mounted");
