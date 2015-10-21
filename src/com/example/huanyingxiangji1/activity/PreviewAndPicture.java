@@ -30,7 +30,7 @@ import com.example.huanyingxiangji1.utils.SharedPrefUtils;
 import java.io.File;
 import java.io.IOException;
 
-public class PreviewAndPicture extends Activity {
+public class  PreviewAndPicture extends Activity {
     static String TAG = PreviewAndPicture.class.getName();
 
 
@@ -251,6 +251,10 @@ public class PreviewAndPicture extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_CANCELED) {
+            return;
+        }
+
         switch (requestCode) {
             case REQUEST_SELECT_PIC:
                 if (resultCode == RESULT_OK && data != null) {
@@ -267,13 +271,16 @@ public class PreviewAndPicture extends Activity {
                     savePreference();
                     loadMeng();
                 } else {
-                   Toast.makeText(this, getString(R.string.faild_select_meng), Toast.LENGTH_LONG).show();
+                   showToast(R.string.faild_select_meng);
                 }
                 break;
-
             default:
                 break;
         }
+    }
+
+    private void showToast(int msgResId) {
+        Toast.makeText(this, getString(msgResId), Toast.LENGTH_LONG).show();
     }
 
     String fileName = null;
