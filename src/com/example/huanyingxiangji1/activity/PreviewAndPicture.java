@@ -283,26 +283,19 @@ public class  PreviewAndPicture extends Activity {
         Toast.makeText(this, getString(msgResId), Toast.LENGTH_LONG).show();
     }
 
-    String fileName = null;
-
     /**
      * when touch the picture button ,this function will be called
      *
      * @param v
      */
     public void pictureButtonClick(View v) {
-        fileName = SomeTool.genPicPathName(MyApplication.pic_path);
         JPEGCallBack jpegCallBack = new JPEGCallBack(mHandler);
-        jpegCallBack.setPath(fileName);
-
         try {
             mCamera.takePicture(null, null, jpegCallBack);
         } catch (Exception e) {
             Log.e(TAG, "takepicture error");
             e.printStackTrace();
         }
-        Toast.makeText(PreviewAndPicture.this, "save to " + fileName,
-                Toast.LENGTH_LONG).show();
     }
 
     public void switchCameraButtonClick(View view) {
