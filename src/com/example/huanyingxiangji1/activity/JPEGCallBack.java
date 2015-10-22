@@ -47,5 +47,4 @@ public class JPEGCallBack implements PictureCallback {
 			e.printStackTrace();
 		}
 	}
-
 }
