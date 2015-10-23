@@ -36,13 +36,6 @@
         android:layout_gravity="bottom"
         android:onClick="onSelectMengBtnClick"
         android:enabled="false"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/savePathBtn"
-        android:text="@string/save_path"
-        android:layout_gravity="bottom|right"
-        android:onClick="savePathBtnClick"/>
 
     <Button
         android:layout_width="wrap_content"

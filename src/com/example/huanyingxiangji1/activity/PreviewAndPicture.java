@@ -54,7 +54,6 @@ public class  PreviewAndPicture extends Activity {
 
     private static Camera mCamera;
     public static int mWhichCamera = CameraHelper.CAMERA_BACK;
-    private String mSavePath;
     private boolean mHasMeng;
     private Uri mMengUri;
     private int mMengAlpha = 5;
@@ -165,18 +164,11 @@ public class  PreviewAndPicture extends Activity {
         mHasMeng = SharedPrefUtils.getBoolean(KEY_HAS_MENG);
         mMengUri = Uri.parse(SharedPrefUtils.getString(KEY_MENG_PATH));
 
-        // File
-        File storeDir = Environment
-                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        mSavePath = SharedPrefUtils.getString(KEY_SAVE_PATH,
-                storeDir.getAbsolutePath());
-        LogHelper.i(TAG, "the save path of picture is " + mSavePath);
-
         mMengAlpha = SharedPrefUtils.getInt(KEY_ALPHA, DEFAULT_ALPHA);
 
         mWhichCamera = SharedPrefUtils.getInt(KEY_WHICH_CAMERA, CameraHelper.CAMERA_BACK);
 
-        LogHelper.i(TAG, "mengUrl = " + mMengUri + ",savePath = " + mSavePath + ",mMengAlpha = " + mMengAlpha + ",mWitchCamera = " + mWhichCamera);
+        LogHelper.i(TAG, "mengUrl = " + mMengUri + ",mMengAlpha = " + mMengAlpha + ",mWitchCamera = " + mWhichCamera);
     }
 
     @Override
@@ -228,7 +220,6 @@ public class  PreviewAndPicture extends Activity {
     private void savePreference() {
         SharedPrefUtils.put(KEY_ALPHA, mMengAlpha);
         SharedPrefUtils.put(KEY_MENG_PATH, mMengUri.toString());
-        SharedPrefUtils.put(KEY_SAVE_PATH, mSavePath);
         SharedPrefUtils.put(KEY_HAS_MENG, mHasMeng);
         SharedPrefUtils.put(KEY_WHICH_CAMERA, mWhichCamera);
     }
@@ -300,30 +291,6 @@ public class  PreviewAndPicture extends Activity {
 
     public void switchCameraButtonClick(View view) {
         switchCamera();
-    }
-
-    public void savePathBtnClick(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("path");
-        final EditText pathText = new EditText(this);
-        builder.setView(pathText);
-        builder.setPositiveButton("ok",
-                new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int which) {
-                        String tmp = pathText.getText().toString();
-                        File testFile = new File(tmp);
-                        if (testFile.isDirectory()) {
-                            mSavePath = tmp;
-
-                        } else {
-                            Toast.makeText(PreviewAndPicture.this,
-                                    "not a directory", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-        builder.setNegativeButton("cancel", null);
-        builder.show();
     }
 
     public void onSelectMengBtnClick(View view) {
