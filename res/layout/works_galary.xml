@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.huanyingxiangji1.view.AdvancedGallary
-    android:id="@+id/worksGallary"
-    android:layout_height="match_parent"
+<ScrollView
+    android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:numColumns="3"
-    android:stretchMode="columnWidth"
-    android:choiceMode="multipleChoice"
-    android:drawSelectorOnTop="false"
-    android:background="#619ad7"
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.example.huanyingxiangji1.view.AdvancedGallary
+        android:id="@+id/worksGallary"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="#619ad7">
+    </com.example.huanyingxiangji1.view.AdvancedGallary>
+</ScrollView>

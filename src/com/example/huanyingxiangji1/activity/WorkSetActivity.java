@@ -16,6 +16,7 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Loader;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,12 +43,12 @@ public class WorkSetActivity extends Activity implements
 
     private AdvancedGallary mGallery;
 	public List<ImageData> mWorks;
-	private WorksAdapter mAdapter;
+//	private WorksAdapter mAdapter;
 
 	private Handler mHandler = new Handler() {
 		public void dispatchMessage(android.os.Message msg) {
-			mGallery.setAdapter(mAdapter);
-			mAdapter.notifyDataSetChanged();
+//			mGallery.setAdapter(mAdapter);
+//			mAdapter.notifyDataSetChanged();
 		}
 	};
     //因为构造 gifView 的时候在 workthread 里，所以需要传一个在 ui 线程的 handler
@@ -59,9 +60,9 @@ public class WorkSetActivity extends Activity implements
         }
    };
 	
-	static class ImageData {
+	public static class ImageData {
 		FileType mType;
-		Object mData;
+		public Object mData;
 		public ImageData(FileType type,Object data) {
 			mType=type;
 			mData=data;
@@ -71,12 +72,10 @@ public class WorkSetActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.works_galary);
 
-		mGallery = (AdvancedGallary) findViewById(R.id.worksGallary);
-		mAdapter = new WorksAdapter();
+        setContentView(R.layout.works_galary);
+        mGallery = (AdvancedGallary)findViewById(R.id.worksGallary);
 
-		setListShown(false);
 		// Prepare the loader. Either re-connect with an existing one,
 		// or start a new one.
 		getLoaderManager().initLoader(LOADER_ID, null, this);
@@ -118,16 +117,17 @@ public class WorkSetActivity extends Activity implements
 
 	@Override
 	public void onLoadFinished(Loader<List<ImageData>> loader, List<ImageData> data) {
-		mAdapter.setData(data);
-		// The list should now be shown.
-		mGallery.setAdapter(mAdapter);
-		setListShown(true);
-		mAdapter.notifyDataSetInvalidated();
+//		mAdapter.setData(data);
+//		// The list should now be shown.
+//		mGallery.setAdapter(mAdapter);
+//		setListShown(true);
+//		mAdapter.notifyDataSetInvalidated();
+        mGallery.addViewData(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<List<ImageData>> loader) {
-		mAdapter.setData(null);
+//		mAdapter.setData(null);
 
 	}
 
