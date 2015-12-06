@@ -16,6 +16,7 @@ import com.example.huanyingxiangji1.utils.LogHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,20 +37,31 @@ public class PicProcessor {
     public PicProcessor() {
     }
 
-    public static Bitmap getBitmapFromUri(Context c, Uri uri, float scale)
-            throws Exception {
-        Bitmap b = null;
+    /**
+     * 根据 uri 获取一个缩放了的bitmap
+     * @param c
+     * @param uri
+     * @param scale
+     * @return 图片
+     */
+    public static Bitmap getBitmapFromUri(Context c, Uri uri, float scale) {
+        Bitmap b;
         if (uri.getScheme().equals("content")) {
-            b = BitmapFactory.decodeStream(c.getContentResolver()
-                    .openInputStream(uri));
+            try {
+                b = BitmapFactory.decodeStream(c.getContentResolver()
+                        .openInputStream(uri));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
         } else {
-            Log.d(TAG, "Bitmap uri :" + uri);
             b = BitmapFactory.decodeFile(uri.getPath());
-
         }
         if (b == null) {
-            throw new Exception("hello error");
+            return null;
         }
+
+        // 缩小
         Bitmap tmp = Bitmap.createScaledBitmap(b, (int) (b.getWidth() * scale),
                 (int) (b.getHeight() * scale), true);
         b.recycle();

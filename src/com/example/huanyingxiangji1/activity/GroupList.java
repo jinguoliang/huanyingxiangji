@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GroupList extends ListActivity implements OnItemClickListener {
-    private static final String TAG = GroupList.class.getName();
+    private static final String TAG = "GroupList";
 
     private static final int CREATE_GROUP = 1;
     private static final int ADD_NEW_PICTURE = 2;
@@ -46,10 +46,10 @@ public class GroupList extends ListActivity implements OnItemClickListener {
     MyApplication application;
     FileProcessor fileProcessor;
     PicProcessor picProcessor;
+
     private String mCurrentGroupName;
 
     /*
-     * (non-Javadoc)
      *
      * @see android.app.Activity#onCreate(android.os.Bundle)
      */
@@ -200,12 +200,16 @@ public class GroupList extends ListActivity implements OnItemClickListener {
                 }
                 return true;
             case R.id.add_new_pic:
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.addCategory(Intent.CATEGORY_DEFAULT);
-                intent.setType("image/*");
-                Log.e(TAG, "groupName = " + mCurrentGroupName);
-
-                startActivityForResult(intent, ADD_NEW_PICTURE);
+//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                intent.addCategory(Intent.CATEGORY_DEFAULT);
+//                intent.setType("image/*");
+//                Log.e(TAG, "groupName = " + mCurrentGroupName);
+//
+//                startActivityForResult(intent, ADD_NEW_PICTURE);
+                i = new Intent(this, PreviewAndPicture.class);
+                i.putExtra(PreviewAndPicture.KEY_FROM, GroupList.class.getSimpleName());
+                i.putExtra(PreviewAndPicture.KEY_MENG_PATH, (fileProcessor.getGroup(mCurrentGroupName).get(0)));
+                startActivityForResult(i, ADD_NEW_PICTURE);
                 return true;
             default:
                 return super.onContextItemSelected(item);

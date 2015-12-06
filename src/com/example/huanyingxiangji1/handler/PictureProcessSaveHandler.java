@@ -53,20 +53,6 @@ public class PictureProcessSaveHandler extends Handler {
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         LogHelper.i(TAG, "the size of the picture just taken is (" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
         mainHandler.sendMessage(mainHandler.obtainMessage(PreviewAndPicture.MSG_PICTURE));
-
-        MyApplication.putPic("newPic", bitmap);
-        try {
-            if (PreviewAndPicture.mWhichCamera == CameraHelper.CAMERA_FRONT) {
-                bitmap = PicProcessor.rotatePic(bitmap, -90);
-                bitmap = PicProcessor.turnPicture(bitmap);
-            } else {
-                bitmap = PicProcessor.rotatePic(bitmap, 90);
-            }
-            MyApplication.newPicPath = SomeTool.genPicPathName(MyApplication.pic_path);
-            PicProcessor.storePic(bitmap, MyApplication.newPicPath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void process(byte[] data) {

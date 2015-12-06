@@ -1,51 +1,47 @@
 package com.example.huanyingxiangji1.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.PicProcessor;
-import com.example.huanyingxiangji1.processor.SomeTool;
 import com.example.huanyingxiangji1.utils.CameraHelper;
 import com.example.huanyingxiangji1.utils.LogHelper;
 import com.example.huanyingxiangji1.utils.SharedPrefUtils;
+import com.example.huanyingxiangji1.utils.ViewUtils;
+import com.example.huanyingxiangji1.view.MengView;
 
 import java.io.File;
 import java.io.IOException;
 
-public class  PreviewAndPicture extends Activity {
-    static String TAG = PreviewAndPicture.class.getName();
+public class PreviewAndPicture extends Activity {
+    private static final String TAG = "PreviewAndPicture";
 
+    // intent bundle key
+    public static final String KEY_FROM = "from";
+    public static final String KEY_MENG_PATH = "kmp";
 
-    private static final String KEY_HAS_MENG = "khm";
-    private static final String KEY_MENG_PATH = "kmp";
-    private static final java.lang.String KEY_SAVE_PATH = "ksp";
-    private static final String KEY_WHICH_CAMERA = "kwc";
-    private static final String KEY_ALPHA = "ka";
-
-    public static final int DEFAULT_ALPHA = 75;
+    private boolean isFromPictureGroup;
 
     public static final int MSG_PICTURE = 1;
 
+    // 请求外部程序选择蒙图片
     private static final int REQUEST_SELECT_PIC = 0;
 
+    // 视图控件
     private MengView mMengImageView;
     private CameraSurfaceView mPreview;
     private Button mSelectMengBtn;
@@ -53,6 +49,9 @@ public class  PreviewAndPicture extends Activity {
     private SeekBar mMengAlphaSb;
 
     private static Camera mCamera;
+    private JPEGCallBack mCallBack;
+
+    // 一些状态
     public static int mWhichCamera = CameraHelper.CAMERA_BACK;
     private boolean mHasMeng;
     private Uri mMengUri;
@@ -66,12 +65,18 @@ public class  PreviewAndPicture extends Activity {
                 case MSG_PICTURE:
                     if (PreviewAndPicture.this.mHasMeng) {
                         Log.e(TAG, "ok to create group");
-
-                        Intent i = new Intent(PreviewAndPicture.this,
-                                CreateNewGroup.class);
-                        i.putExtra("mengpic", mMengUri.toString());
-                        i.putExtra("newpic", "file:///" + MyApplication.newPicPath);
-                        PreviewAndPicture.this.startActivity(i);
+                        if (isFromPictureGroup) {
+                            Intent i = new Intent();
+                            i.setData(Uri.parse("file:///" + mCallBack.mPicPath));
+                            setResult(RESULT_OK, i);
+                            finish();
+                        } else {
+                            Intent i = new Intent(PreviewAndPicture.this,
+                                    CreateNewGroup.class);
+                            i.putExtra("mengpic", mMengUri.toString());
+                            i.putExtra("newpic", "file:///" + mCallBack.mPicPath);
+                            PreviewAndPicture.this.startActivity(i);
+                        }
                     } else {
                         mCamera.startPreview();
                     }
@@ -88,7 +93,15 @@ public class  PreviewAndPicture extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
 
-        readPreference();
+        loadConfig();
+
+        // 处理 intent
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.getString(KEY_FROM).equals(GroupList.class.getSimpleName())) {
+            isFromPictureGroup = true;
+            mMengUri = Uri.parse("file://" + bundle.getString(KEY_MENG_PATH));
+            mHasMeng = true;
+        }
 
         initialView();
     }
@@ -109,6 +122,7 @@ public class  PreviewAndPicture extends Activity {
 
         if (mCamera != null) {
             initialNormalView();
+            configureView();
         } else {
             Toast.makeText(this, getString(R.string.toast_no_camera), Toast.LENGTH_LONG).show();
             this.finish();
@@ -117,13 +131,13 @@ public class  PreviewAndPicture extends Activity {
 
     private void initialNormalView() {
         mPreview = (CameraSurfaceView) findViewById(R.id.cameraSurfaceView);
-        mPreview.changeCamera(mCamera);
+        mPreview.setCamera(mCamera);
 
         mMengImageView = (MengView) findViewById(R.id.mengView);
         mMengImageView.setAlpha(mMengAlpha);
-        mSelectMengBtn = (Button)findViewById(R.id.mengPathBtn);
-        mMengCb = (CheckBox)findViewById(R.id.mengCb);
-        mMengAlphaSb = (SeekBar)findViewById(R.id.mengAlphaSb);
+        mSelectMengBtn = (Button) findViewById(R.id.mengPathBtn);
+        mMengCb = (CheckBox) findViewById(R.id.mengCb);
+        mMengAlphaSb = (SeekBar) findViewById(R.id.mengAlphaSb);
         mMengAlphaSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -142,8 +156,6 @@ public class  PreviewAndPicture extends Activity {
             }
         });
         mMengAlphaSb.setProgress(mMengAlpha);
-
-        configureView();
     }
 
     private void configureView() {
@@ -151,7 +163,7 @@ public class  PreviewAndPicture extends Activity {
             mMengImageView.setVisibility(View.VISIBLE);
             mMengAlphaSb.setVisibility(View.VISIBLE);
             mSelectMengBtn.setEnabled(true);
-        }else {
+        } else {
             mMengImageView.setVisibility(View.INVISIBLE);
             mMengAlphaSb.setVisibility(View.INVISIBLE);
             mSelectMengBtn.setEnabled(false);
@@ -160,13 +172,11 @@ public class  PreviewAndPicture extends Activity {
     }
 
 
-    private void readPreference() {
-        mHasMeng = SharedPrefUtils.getBoolean(KEY_HAS_MENG);
-        mMengUri = Uri.parse(SharedPrefUtils.getString(KEY_MENG_PATH));
-
-        mMengAlpha = SharedPrefUtils.getInt(KEY_ALPHA, DEFAULT_ALPHA);
-
-        mWhichCamera = SharedPrefUtils.getInt(KEY_WHICH_CAMERA, CameraHelper.CAMERA_BACK);
+    private void loadConfig() {
+        mHasMeng = SharedPrefUtils.hasMeng();
+        mMengUri = Uri.parse(SharedPrefUtils.getMengPath());
+        mMengAlpha = SharedPrefUtils.getMengAlpha();
+        mWhichCamera = SharedPrefUtils.getWitchCamera();
 
         LogHelper.i(TAG, "mengUrl = " + mMengUri + ",mMengAlpha = " + mMengAlpha + ",mWitchCamera = " + mWhichCamera);
     }
@@ -178,8 +188,9 @@ public class  PreviewAndPicture extends Activity {
             mCamera.reconnect();
         } catch (IOException e) {
             e.printStackTrace();
+            ViewUtils.showToast(this, getString(R.string.reconnect_error));
         }
-        if(mHasMeng) {
+        if (mHasMeng) {
             loadMeng();
         }
     }
@@ -187,7 +198,7 @@ public class  PreviewAndPicture extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-
+        mCamera.unlock();
         if (mMengBitmap != null) {
             mMengBitmap.recycle();
             mMengBitmap = null;
@@ -197,6 +208,7 @@ public class  PreviewAndPicture extends Activity {
 
     private void loadMeng() {
         //TODO 应该放到单线程里
+        LogHelper.i(TAG, "the current meng url = " + mMengUri);
         try {
             mMengBitmap = PicProcessor.getBitmapFromUri(this, mMengUri,
                     PicProcessor.SCALE_MID);
@@ -218,10 +230,10 @@ public class  PreviewAndPicture extends Activity {
     }
 
     private void savePreference() {
-        SharedPrefUtils.put(KEY_ALPHA, mMengAlpha);
-        SharedPrefUtils.put(KEY_MENG_PATH, mMengUri.toString());
-        SharedPrefUtils.put(KEY_HAS_MENG, mHasMeng);
-        SharedPrefUtils.put(KEY_WHICH_CAMERA, mWhichCamera);
+        SharedPrefUtils.putMengAlpha(mMengAlpha);
+        SharedPrefUtils.putMengPath(mMengUri.toString());
+        SharedPrefUtils.putHasMeng(mHasMeng);
+        SharedPrefUtils.putWhichCamera(mWhichCamera);
     }
 
     @Override
@@ -236,7 +248,7 @@ public class  PreviewAndPicture extends Activity {
 
         mWhichCamera = CameraHelper.getAnotherCamera(mWhichCamera);
         mCamera = CameraHelper.getCameraInstance(mWhichCamera);
-        mPreview.changeCamera(mCamera);
+        mPreview.setCamera(mCamera);
     }
 
 
@@ -262,7 +274,7 @@ public class  PreviewAndPicture extends Activity {
                     savePreference();
                     loadMeng();
                 } else {
-                   showToast(R.string.faild_select_meng);
+                    showToast(R.string.faild_select_meng);
                 }
                 break;
             default:
@@ -280,13 +292,8 @@ public class  PreviewAndPicture extends Activity {
      * @param v
      */
     public void pictureButtonClick(View v) {
-        JPEGCallBack jpegCallBack = new JPEGCallBack(mHandler);
-        try {
-            mCamera.takePicture(null, null, jpegCallBack);
-        } catch (Exception e) {
-            Log.e(TAG, "takepicture error");
-            e.printStackTrace();
-        }
+        mCallBack = new JPEGCallBack(mHandler);
+        mCamera.takePicture(null, null, mCallBack);
     }
 
     public void switchCameraButtonClick(View view) {
@@ -310,7 +317,7 @@ public class  PreviewAndPicture extends Activity {
     }
 
     private void checkMengCb(boolean checked) {
-        if(checked != mMengCb.isChecked()) {
+        if (checked != mMengCb.isChecked()) {
             mMengCb.toggle();
         }
     }

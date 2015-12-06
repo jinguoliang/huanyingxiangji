@@ -9,16 +9,20 @@ import android.os.Handler;
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.handler.PictureProcessSaveHandler;
 import com.example.huanyingxiangji1.processor.PicProcessor;
+import com.example.huanyingxiangji1.processor.SomeTool;
 import com.example.huanyingxiangji1.utils.CameraHelper;
 import com.example.huanyingxiangji1.utils.LogHelper;
 
 
 public class JPEGCallBack implements PictureCallback {
+	final private String TAG="JPEGCallBack";
 
 	String path;
-	final private String TAG="JPEGCallBack";
 	private Handler mHandler;
-	public JPEGCallBack(Handler handler) {
+
+    public String mPicPath;
+
+    public JPEGCallBack(Handler handler) {
 		mHandler=handler;
 	}
 	public String getPath() {
@@ -28,7 +32,30 @@ public class JPEGCallBack implements PictureCallback {
 		this.path = path;
 	}
 	
-	public void onPictureTaken(byte[] data, Camera camera) {
-        PictureProcessSaveHandler.getIntance(mHandler).process(data);
+	public void onPictureTaken(final byte[] data, Camera camera) {
+        new Thread() {
+            @Override
+            public void run() {
+                handleProcessPicData(data);
+            }
+        }.start();
 	}
+
+	private synchronized void handleProcessPicData(byte[] data) {
+		Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+		LogHelper.i(TAG, "the size of the picture just taken is (" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
+        try {
+			if (PreviewAndPicture.mWhichCamera == CameraHelper.CAMERA_FRONT) {
+				bitmap = PicProcessor.rotatePic(bitmap, -90);
+				bitmap = PicProcessor.turnPicture(bitmap);
+			} else {
+				bitmap = PicProcessor.rotatePic(bitmap, 90);
+			}
+			mPicPath = SomeTool.genPicPathName(MyApplication.pic_path);
+			PicProcessor.storePic(bitmap, mPicPath);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        mHandler.sendMessage(mHandler.obtainMessage(PreviewAndPicture.MSG_PICTURE));
+    }
 }

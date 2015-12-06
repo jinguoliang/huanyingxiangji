@@ -19,6 +19,7 @@ import android.widget.ImageView;
 
 import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
+import com.example.huanyingxiangji1.view.MengView;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,6 @@ public class ViewPicture extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -45,13 +45,11 @@ public class ViewPicture extends FragmentActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
-		// TODO Auto-generated method stub
 		super.onCreateContextMenu(menu, v, menuInfo);
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		return super.onContextItemSelected(item);
 	}
 

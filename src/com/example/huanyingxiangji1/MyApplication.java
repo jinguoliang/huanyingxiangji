@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyApplication extends Application {
-	public static MyApplication APP;
+	private static MyApplication sMyApplication;
 
 	final public static String APP_SD_DIR= Environment.getExternalStorageDirectory() + "/huanyingxiangji/"; //the root of application
 	final public static String GROUP_DIR="group/";
@@ -21,25 +21,13 @@ public class MyApplication extends Application {
 	public static final String out_path=APP_SD_DIR+OUT_DIR;
 	public static final String pic_path=APP_SD_DIR+PIC_DIR;
 
-	public final static String mengPic="mengPic"; 
-	public  static String newPicPath=""; 
-	
-	private static Map<String, Bitmap>picMap=new HashMap<String, Bitmap>();
-
-	public static Bitmap getPic(String picName) {
-		synchronized (picMap) {
-			return picMap.get(picName);
-		}
-	}
-	public static void putPic(String picName,Bitmap b) {
-		synchronized (picMap) {
-			MyApplication.picMap.put(picName, b);
-		}
-	}
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		APP = this;
+		sMyApplication = this;
+	}
+
+	public static MyApplication getInstance(){
+		return sMyApplication;
 	}
 }

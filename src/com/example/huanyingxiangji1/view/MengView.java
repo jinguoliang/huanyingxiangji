@@ -1,4 +1,4 @@
-package com.example.huanyingxiangji1.activity;
+package com.example.huanyingxiangji1.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
