@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -64,10 +65,15 @@ public class CreateNewGroup extends Activity implements OnClickListener {
     }
 
     @Override
-    public void onClick(View arg0) {
-        switch (arg0.getId()) {
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.OK:
-                finishCreateNewGroup();
+                String groupName = groupNameText.getText().toString();
+                if (TextUtils.isEmpty(groupName)) {
+                    ViewUtils.showToast(this, getString(R.string.new_group_empty_name));
+                    return;
+                }
+                finishCreateNewGroup(groupName);
                 break;
             case R.id.cancel:
                 setResult(RESULT_CANCELED);
@@ -92,18 +98,33 @@ public class CreateNewGroup extends Activity implements OnClickListener {
     }
 
 
-    private void finishCreateNewGroup() {
+    private void finishCreateNewGroup(String groupName) {
+        boolean hasPic1 = mPic1Uri != null;
+        boolean hasPic2 = mPic2Uri != null;
+        if (!hasPic1 && !hasPic2) {
+            ViewUtils.showToast(this, getString(R.string.new_group_empty));
+            return;
+        }
+        Uri first = null;
+        Uri second = null;
+        if (hasPic1) {
+            first = mPic1Uri;
+        } else {
+            first = mPic2Uri;
+        }
+        if (hasPic1 && hasPic2) {
+            second = mPic2Uri;
+        }
+
         FileProcessor processor = new FileProcessor();
-        String groupName = groupNameText.getText().toString();
         try {
-            processor.createGroup(groupName, mPic1Uri,
-                    mPic2Uri, this);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            processor.createGroup(this, groupName, first);
+            if (hasPic1 && hasPic2) {
+                processor.addToGroup(this, groupName, second);
+            }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            ViewUtils.showToast(this, getString(R.string.group_create_error));
         }
         this.finish();
     }

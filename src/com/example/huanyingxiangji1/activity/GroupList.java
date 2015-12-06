@@ -28,8 +28,10 @@ import com.example.huanyingxiangji1.R;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.utils.LogHelper;
+import com.example.huanyingxiangji1.utils.ViewUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -200,12 +202,6 @@ public class GroupList extends ListActivity implements OnItemClickListener {
                 }
                 return true;
             case R.id.add_new_pic:
-//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//                intent.addCategory(Intent.CATEGORY_DEFAULT);
-//                intent.setType("image/*");
-//                Log.e(TAG, "groupName = " + mCurrentGroupName);
-//
-//                startActivityForResult(intent, ADD_NEW_PICTURE);
                 i = new Intent(this, PreviewAndPicture.class);
                 i.putExtra(PreviewAndPicture.KEY_FROM, GroupList.class.getSimpleName());
                 i.putExtra(PreviewAndPicture.KEY_MENG_PATH, (fileProcessor.getGroup(mCurrentGroupName).get(0)));
@@ -257,7 +253,12 @@ public class GroupList extends ListActivity implements OnItemClickListener {
             ((BaseAdapter) getListAdapter()).notifyDataSetChanged();
         } else if (requestCode == ADD_NEW_PICTURE && resultCode == RESULT_OK) {
             Log.e(TAG, "groupName = " + mCurrentGroupName);
-            fileProcessor.addToGroup(mCurrentGroupName, fileProcessor.getInputStreamFrom(data.getData(), this));
+            try {
+                fileProcessor.addToGroup(this, mCurrentGroupName, data.getData());
+            } catch (IOException e) {
+                e.printStackTrace();
+                ViewUtils.showToast(this, getString(R.string.group_add_new_error));
+            }
             //TODO
         }
     }

@@ -27,6 +27,10 @@
     <string name="back"><![CDATA[<]]></string>
     <string name="new_group_load_pic_err">加载图片错误，请重新选择</string>
     <string name="reconnect_error">无法打开相机，检测到被其他应用使用</string>
+    <string name="group_add_new_error">添加新图片出错</string>
+    <string name="group_create_error">创建新组出错</string>
+    <string name="new_group_empty">请点击上面按钮选择至少一个图片</string>
+    <string name="new_group_empty_name">请填写组名</string>
 
 
 </resources>
