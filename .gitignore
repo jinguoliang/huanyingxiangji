@@ -32,4 +32,9 @@ Thumbs.db
 .gradle
 build/
 
-local.properties
+.settings/
+gradle/
+gradle*
+import-summary.txt
+.gradle/
+*.iml
