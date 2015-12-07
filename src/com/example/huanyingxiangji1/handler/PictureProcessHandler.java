@@ -10,12 +10,11 @@ import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.utils.LogHelper;
 
-import java.security.MessageDigest;
-
 /**
  * Created by jinux on 15/10/21.
  */
-public class PictureProcessSaveHandler extends Handler {
+public class PictureProcessHandler extends Handler {
+    private static final String TAG = "PictureProcessHandler";
 
     private static final int MSG_PROCESS = 1;
     private static final int MSG_GEN_GIF = 2;
