@@ -1,17 +1,13 @@
 package com.example.huanyingxiangji1.handler;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
 import com.example.huanyingxiangji1.MyApplication;
-import com.example.huanyingxiangji1.activity.PreviewAndPicture;
+import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
-import com.example.huanyingxiangji1.processor.SomeTool;
-import com.example.huanyingxiangji1.utils.CameraHelper;
 import com.example.huanyingxiangji1.utils.LogHelper;
 
 import java.security.MessageDigest;
@@ -22,44 +18,93 @@ import java.security.MessageDigest;
 public class PictureProcessSaveHandler extends Handler {
 
     private static final int MSG_PROCESS = 1;
-    private static final String TAG = PictureProcessSaveHandler.class.getSimpleName();
+    private static final int MSG_GEN_GIF = 2;
+    private static final int MSG_COMB_HORIZONAL = 3;
+    private static final int MSG_COMB_VERTICAL = 4;
     private static HandlerThread mThread;
-    private final Handler mainHandler;
+    private final FileProcessor mFileProcessor;
 
-    private PictureProcessSaveHandler(Looper looper, Handler mainHandler) {
+    private PictureProcessHandler(Looper looper) {
         super(looper);
-        this.mainHandler = mainHandler;
+        mFileProcessor = new FileProcessor();
     }
 
-    public static PictureProcessSaveHandler getIntance(Handler mainHandler) {
+    public static PictureProcessHandler getIntance() {
         mThread = new HandlerThread("picture process save");
         mThread.start();
-        PictureProcessSaveHandler handler = new PictureProcessSaveHandler(mThread.getLooper(), mainHandler);
+        PictureProcessHandler handler = new PictureProcessHandler(mThread.getLooper());
         return handler;
     }
 
     @Override
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
+        String groupName = null;
         switch (msg.what) {
-            case MSG_PROCESS:
-                handleProcessPicData(msg);
+            case MSG_COMB_HORIZONAL:
+                groupName = msg.obj.toString();
+                handleCombineHorizonal(groupName);
+                break;
+            case MSG_COMB_VERTICAL:
+                groupName = msg.obj.toString();
+                handleCombineVertical(groupName);
+                break;
+            case MSG_GEN_GIF:
+                groupName = msg.obj.toString();
+                handleGenGif(groupName);
+                break;
+            default:
                 break;
         }
     }
 
-    private void handleProcessPicData(Message msg) {
-        byte[] data = (byte[]) msg.obj;
-        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        LogHelper.i(TAG, "the size of the picture just taken is (" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
-        mainHandler.sendMessage(mainHandler.obtainMessage(PreviewAndPicture.MSG_PICTURE));
+    private void handleGenGif(String groupName) {
+        String dest = MyApplication.out_path + groupName + ".gif";
+        try {
+            PicProcessor.generateGif(mFileProcessor.getGroup(groupName), dest, 2000);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
     }
 
-    public void process(byte[] data) {
-        Message message = obtainMessage(MSG_PROCESS);
-        message.obj = data;
+    private void handleCombineHorizonal(String groupName) {
+        String dest = MyApplication.out_path + groupName + "_h.jpg";
+
+        try {
+            new PicProcessor().combinate(mFileProcessor.getGroup(groupName),
+                    dest, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleCombineVertical(String groupName) {
+        String dest = MyApplication.out_path + groupName + "_v.jpg";
+
+        try {
+            new PicProcessor().combinate(mFileProcessor.getGroup(groupName),
+                    dest, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogHelper.e(TAG, "failed to combine pictures");
+        }
+    }
+
+    public void generateGif(String groupName) {
+        packMsg(MSG_GEN_GIF, groupName);
+    }
+
+    public void combineHorizonal(String groupName) {
+        packMsg(MSG_COMB_HORIZONAL, groupName);
+    }
+
+    public void combineVertical(String groupName) {
+        packMsg(MSG_COMB_VERTICAL, groupName);
+    }
+
+    private void packMsg(int msg, String groupName) {
+        Message message = obtainMessage(msg);
+        message.obj = groupName;
         sendMessage(message);
     }
-
-
 }

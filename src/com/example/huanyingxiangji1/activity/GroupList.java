@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
+import com.example.huanyingxiangji1.handler.PictureProcessHandler;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.utils.LogHelper;
@@ -47,7 +48,6 @@ public class GroupList extends ListActivity implements OnItemClickListener {
     List<Map<String, Object>> list;
     MyApplication application;
     FileProcessor fileProcessor;
-    PicProcessor picProcessor;
 
     private String mCurrentGroupName;
 
@@ -145,71 +145,53 @@ public class GroupList extends ListActivity implements OnItemClickListener {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        PictureProcessHandler handler = PictureProcessHandler.getIntance();
 
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
                 .getMenuInfo();
         int id = (int) info.id;
-        if (-1 == id) {
-            super.onContextItemSelected(item);
-        }
-
-        String destPic = "";
         Map<String, Object> map = list.get(id);
         mCurrentGroupName = (String) map.get("groupName");
         switch (item.getItemId()) {
             case R.id.newGroup:
-                Intent i = new Intent(this, CreateNewGroup.class);
-                startActivityForResult(i, CREATE_GROUP);
+                createNewGroup();
                 return true;
             case R.id.deleteGroup:
-                fileProcessor.removeGroup(mCurrentGroupName, false);
-                list.remove(id);
-                ((BaseAdapter) getListAdapter()).notifyDataSetChanged();
+                deleteGroup(id);
                 return true;
             case R.id.generateGif:
-                destPic = MyApplication.out_path + mCurrentGroupName + ".gif";
-                try {
-                    PicProcessor.generateGif(fileProcessor.getGroup(mCurrentGroupName), destPic, 2000);
-                    Toast.makeText(this, "ok " + MyApplication.out_path,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-
+                handler.generateGif(mCurrentGroupName);
                 return true;
             case R.id.combinate_h:
-                picProcessor = new PicProcessor();
-                try {
-                    destPic = MyApplication.out_path + mCurrentGroupName + "_h.jpg";
-                    picProcessor.combinate(fileProcessor.getGroup(mCurrentGroupName),
-                            destPic, 0);
-                    Toast.makeText(this, "ok " + MyApplication.out_path,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                handler.combineHorizonal(mCurrentGroupName);
                 return true;
             case R.id.combinate_v:
-                picProcessor = new PicProcessor();
-                try {
-                    destPic = MyApplication.out_path + mCurrentGroupName + "_v.jpg";
-                    picProcessor.combinate(fileProcessor.getGroup(mCurrentGroupName),
-                            destPic, 1);
-                    Toast.makeText(this, "ok " + MyApplication.out_path,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                handler.combineVertical(mCurrentGroupName);
                 return true;
             case R.id.add_new_pic:
-                i = new Intent(this, PreviewAndPicture.class);
-                i.putExtra(PreviewAndPicture.KEY_FROM, GroupList.class.getSimpleName());
-                i.putExtra(PreviewAndPicture.KEY_MENG_PATH, (fileProcessor.getGroup(mCurrentGroupName).get(0)));
-                startActivityForResult(i, ADD_NEW_PICTURE);
+                addNewPic();
                 return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void deleteGroup(int id) {
+        fileProcessor.removeGroup(mCurrentGroupName, false);
+        list.remove(id);
+        ((BaseAdapter) getListAdapter()).notifyDataSetChanged();
+    }
+
+    private void createNewGroup() {
+        Intent i = new Intent(this, CreateNewGroup.class);
+        startActivityForResult(i, CREATE_GROUP);
+    }
+
+    private void addNewPic() {
+        Intent i = new Intent(this, PreviewAndPicture.class);
+        i.putExtra(PreviewAndPicture.KEY_FROM, GroupList.class.getSimpleName());
+        i.putExtra(PreviewAndPicture.KEY_MENG_PATH, (fileProcessor.getGroup(mCurrentGroupName).get(0)));
+        startActivityForResult(i, ADD_NEW_PICTURE);
     }
 
     @Override

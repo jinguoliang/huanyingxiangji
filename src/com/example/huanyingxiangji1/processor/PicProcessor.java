@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.example.huanyingxiangji1.gif.GifEncoder;
@@ -39,6 +40,7 @@ public class PicProcessor {
 
     /**
      * 根据 uri 获取一个缩放了的bitmap
+     *
      * @param c
      * @param uri
      * @param scale
@@ -96,11 +98,11 @@ public class PicProcessor {
 
     public static void generateGif(List<String> picPathList,
                                    String gifPath, int delay) throws Exception {
-        LogHelper.i(TAG, "the first pic = " + picPathList.get(0));
         try {
+            String tmpFile = gifPath + ".tmp";
+            long start = SystemClock.currentThreadTimeMillis();
             GifEncoder gifEncoder = new GifEncoder();
-            Log.e(TAG, "gifPath = " + gifPath);
-            gifEncoder.start(new FileOutputStream(gifPath));
+            gifEncoder.start(new FileOutputStream(tmpFile));
 
             gifEncoder.setDelay(delay); // 500ms between frames
 
@@ -112,12 +114,12 @@ public class PicProcessor {
                 Bitmap bitmap = getBitmapFromUri(null, SomeTool.getUriFromPath(filename), PicProcessor.SCALE_MID);
                 gifEncoder.addFrame(bitmap);
                 bitmap.recycle();
-                Log.e(TAG, "add one frame " + filename);
             }
 
             // Make the gif
             gifEncoder.finish();
-            Log.e(TAG, "gif generated");
+            LogHelper.d(TAG, "the time of gif encode  = " + (SystemClock.currentThreadTimeMillis() - start));
+            new File(tmpFile).renameTo(new File(gifPath));
         } catch (IOException err) {
             Log.getStackTraceString(err);
         }
@@ -177,11 +179,14 @@ public class PicProcessor {
             bitmap.recycle();
         }
 
-        Log.e(tag, destFilePath);
-        File outputFile = new File(Environment.getExternalStorageDirectory() + "/" + destFilePath);
-        outputFile.createNewFile();
+        // 这里使用临时文件，防止在文件还在写的过程中被读
+        File tmpFile = new File(destFilePath + ".tmp");
+        File outputFile = new File(destFilePath);
+        tmpFile.createNewFile();
+        long start = SystemClock.currentThreadTimeMillis();
         destBitmap.compress(Bitmap.CompressFormat.JPEG, 100,
-                new FileOutputStream(outputFile));
+                new FileOutputStream(tmpFile));
+        tmpFile.renameTo(outputFile);
     }
 
     public Bitmap resizePicture(Bitmap bitmap, int cw, int ch) {

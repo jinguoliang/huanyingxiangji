@@ -7,7 +7,6 @@ import android.hardware.Camera.PictureCallback;
 import android.os.Handler;
 
 import com.example.huanyingxiangji1.MyApplication;
-import com.example.huanyingxiangji1.handler.PictureProcessSaveHandler;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.processor.SomeTool;
 import com.example.huanyingxiangji1.utils.CameraHelper;
