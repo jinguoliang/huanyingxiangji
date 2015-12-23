@@ -23,5 +23,8 @@
         android:id="@+id/combinate_v"
         android:title="@string/combinate_v">
     </item>
-
+    <item
+        android:id="@+id/share"
+        android:title="@string/share">
+    </item>
 </menu>

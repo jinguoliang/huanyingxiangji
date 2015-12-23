@@ -29,6 +29,7 @@ import com.example.huanyingxiangji1.handler.PictureProcessHandler;
 import com.example.huanyingxiangji1.processor.FileProcessor;
 import com.example.huanyingxiangji1.processor.PicProcessor;
 import com.example.huanyingxiangji1.utils.LogHelper;
+import com.example.huanyingxiangji1.utils.ShareUtils;
 import com.example.huanyingxiangji1.utils.ViewUtils;
 
 import java.io.File;
@@ -171,9 +172,17 @@ public class GroupList extends ListActivity implements OnItemClickListener {
             case R.id.add_new_pic:
                 addNewPic();
                 return true;
+            case R.id.share:
+                share(mCurrentGroupName);
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void share(String groupName) {
+        Uri uri = Uri.parse("file://" + new FileProcessor().getGroup(groupName).get(0));
+        ShareUtils.share(this, groupName, uri);
     }
 
     private void deleteGroup(int id) {

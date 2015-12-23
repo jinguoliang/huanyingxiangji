@@ -31,6 +31,7 @@
     <string name="group_create_error">创建新组出错</string>
     <string name="new_group_empty">请点击上面按钮选择至少一个图片</string>
     <string name="new_group_empty_name">请填写组名</string>
+    <string name="share">分享</string>
 
 
 </resources>
