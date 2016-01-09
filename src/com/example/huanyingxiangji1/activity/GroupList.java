@@ -1,15 +1,17 @@
 package com.example.huanyingxiangji1.activity;
 
-import android.app.ListActivity;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuInflater;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +19,10 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.SimpleAdapter;
-import android.widget.SimpleAdapter.ViewBinder;
-import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.example.huanyingxiangji1.MyApplication;
 import com.example.huanyingxiangji1.R;
@@ -35,22 +36,21 @@ import com.example.huanyingxiangji1.utils.ViewUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-public class GroupList extends ListActivity implements OnItemClickListener {
+public class GroupList extends Activity {
     private static final String TAG = "GroupList";
 
     private static final int CREATE_GROUP = 1;
     private static final int ADD_NEW_PICTURE = 2;
 
-    List<Map<String, Object>> list;
+    List<List<Object>> mData;
     MyApplication application;
     FileProcessor fileProcessor;
 
     private String mCurrentGroupName;
+    private RecyclerView mGroupList;
+    private MAdapter mAdapter;
 
     /*
      *
@@ -62,66 +62,224 @@ public class GroupList extends ListActivity implements OnItemClickListener {
         setContentView(R.layout.group_list);
         application = (MyApplication) getApplication();
 
-        list = getData();
-        SimpleAdapter adapter = new SimpleAdapter(this, list,
-                R.layout.group_list_item, new String[]{"groupName",
-                "preview0", "preview1", "preview2", "preview3"},
-                new int[]{R.id.groupName, R.id.preview0, R.id.preview1,
-                        R.id.preview2, R.id.preview3});
-        adapter.setViewBinder(new ViewBinder() {
+        mGroupList = (RecyclerView) findViewById(R.id.group_list);
+        mGroupList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        View empty = findViewById(R.id.group_list_empty);
+        registerForContextMenu(mGroupList);
+        loadData();
+    }
+
+    private void loadData() {
+        AsyncTask<Object, Integer, List<List<Object>>> task = new AsyncTask<Object, Integer, List<List<Object>>>() {
             @Override
-            public boolean setViewValue(View view, Object data,
-                                        String textRepresentation) {
-                if (view instanceof ImageView) {
-                    final ImageView iv = (ImageView) view;
-                    iv.setImageBitmap((Bitmap) data);
-                    iv.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                        @Override
-                        public boolean onPreDraw() {
-                            adjustImageViewHeight(iv, 1080, 1920);
-                            iv.getViewTreeObserver().removeOnPreDrawListener(this);
-                            return true;
-                        }
-                    });
+            protected List<List<Object>> doInBackground(Object... params) {
+                return getData();
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+            }
+
+            @Override
+            protected void onPostExecute(List<List<Object>> lists) {
+                super.onPostExecute(lists);
+                mData = lists;
+                mAdapter = new MAdapter(GroupList.this, mData, fileProcessor, new MAdapter.OnGroupSelecter() {
+                    @Override
+                    public void onGroupSelect(String groupName) {
+                        mCurrentGroupName = groupName;
+                    }
+                });
+                mGroupList.setAdapter(mAdapter);
+            }
+        };
+        task.execute();
+    }
+
+    static class MAdapter extends RecyclerView.Adapter {
+
+        private final List<List<Object>> mData;
+        private final Activity mContext;
+        private final FileProcessor mFileProcessor;
+        private final OnGroupSelecter mOnGroupSelector;
+
+        public MAdapter(Activity c, List<List<Object>> data, FileProcessor fileProcessor, OnGroupSelecter onGroupSelecter) {
+            this.mData = data;
+            this.mContext = c;
+            this.mFileProcessor = fileProcessor;
+            this.mOnGroupSelector = onGroupSelecter;
+        }
+
+        class Holder extends RecyclerView.ViewHolder {
+            public final View mView;
+            private final LinearLayout mItemPreviews;
+            private final TextView mItemName;
+            public View mOpt;
+
+            public Holder(View itemView) {
+                super(itemView);
+                mView = itemView;
+                mItemPreviews = (LinearLayout) itemView.findViewById(R.id.list_item);
+                mItemName = (TextView) itemView.findViewById(R.id.list_item_name);
+                mOpt = itemView.findViewById(R.id.list_item_opt);
+            }
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_group_list_item, parent, false);
+            return new Holder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            List<Object> item = mData.get(position);
+            Holder h = (Holder) holder;
+            h.mItemName.setText((String) item.get(0));
+            LogHelper.d(TAG, "the item size = " + item.size());
+            for (int i = 1; i < item.size(); i++) {
+                h.mItemPreviews.addView(createImageView(h.mView.getContext(), (Bitmap) item.get(i)));
+            }
+            new ClickListener(h, (String) item.get(0), mOnGroupSelector);
+        }
+
+        interface OnGroupSelecter {
+            void onGroupSelect(String groupName);
+        }
+
+        // ===========================
+        // 选项单击监听
+        class ClickListener implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+            private final OnGroupSelecter mOnGroupSelector;
+            Holder holder;
+            String groupName;
+
+            public ClickListener(Holder holder, String groupName, OnGroupSelecter onGroupSelecter) {
+                this.holder = holder;
+                this.groupName = groupName;
+                holder.mItemPreviews.setOnClickListener(this);
+                holder.mOpt.setOnClickListener(this);
+                this.mOnGroupSelector = onGroupSelecter;
+            }
+
+            @Override
+            public void onClick(View v) {
+                if (v == holder.mOpt) {
+
+                    PopupMenu menu = new PopupMenu(v.getContext(), holder.mOpt);
+                    menu.inflate(R.menu.group_list_context_menu);
+                    menu.setOnMenuItemClickListener(this);
+                    menu.show();
+                } else if (v == holder.mView || v == holder.mItemPreviews) {
+                    Intent i = new Intent(mContext, ViewPicture.class);
+                    i.putExtra("groupName", mData.get(holder.getAdapterPosition()).get(0).toString());
+                    mContext.startActivity(i);
+                }
+            }
+
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                PictureProcessHandler handler = PictureProcessHandler.getIntance();
+                mOnGroupSelector.onGroupSelect(groupName);
+                int id = item.getItemId();
+                switch (item.getItemId()) {
+                    case R.id.newGroup:
+                        createNewGroup();
+                        return true;
+                    case R.id.deleteGroup:
+                        deleteGroup(id, groupName);
+                        return true;
+                    case R.id.generateGif:
+                        handler.generateGif(groupName);
+                        return true;
+                    case R.id.combinate_h:
+                        handler.combineHorizonal(groupName);
+                        return true;
+                    case R.id.combinate_v:
+                        handler.combineVertical(groupName);
+                        return true;
+                    case R.id.add_new_pic:
+                        addNewPic(groupName);
+                        return true;
+                    case R.id.share:
+                        share(groupName);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        private void share(String groupName) {
+            Uri uri = Uri.parse("file://" + new FileProcessor().getGroup(groupName).get(0));
+            ShareUtils.share(mContext, groupName, uri);
+        }
+
+        private void deleteGroup(int id, String groupName) {
+            mFileProcessor.removeGroup(groupName, false);
+            mData.remove(id);
+        }
+
+        private void createNewGroup() {
+            Intent i = new Intent(mContext, CreateNewGroup.class);
+            mContext.startActivityForResult(i, CREATE_GROUP);
+        }
+
+        private void addNewPic(String groupName) {
+            Intent i = new Intent(mContext, PreviewAndPicture.class);
+            i.putExtra(PreviewAndPicture.KEY_FROM, GroupList.class.getSimpleName());
+            List<String> group = mFileProcessor.getGroup(groupName);
+            i.putExtra(PreviewAndPicture.KEY_MENG_PATH, group.get(group.size() - 1));
+            mContext.startActivityForResult(i, ADD_NEW_PICTURE);
+        }
+
+        private View createImageView(Context c, Bitmap b) {
+            final ImageView iv = new ImageView(c);
+            iv.setImageBitmap(b);
+            iv.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    adjustImageViewHeight(iv, 1080, 1920);
+                    iv.getViewTreeObserver().removeOnPreDrawListener(this);
                     return true;
                 }
-                return false;
-            }
-        });
-        setListAdapter(adapter);
-        registerForContextMenu(getListView());
-        getListView().setOnItemClickListener(this);
+            });
+            iv.setClickable(false);
+            return iv;
+        }
 
+        private void adjustImageViewHeight(ImageView view, int width, int height) {
+            ViewGroup.LayoutParams params = view.getLayoutParams();
+            int viewWidth = view.getWidth();
+            params.height = (int) (height * (float) viewWidth / width);
+            view.setLayoutParams(params);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mData.size();
+        }
     }
 
-    private void adjustImageViewHeight(ImageView view, int width, int height) {
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        int bitmapWidth = width;
-        int bitmapHeight = height;
-        int viewWidth = view.getWidth();
-        params.height = (int) (bitmapHeight * (float) viewWidth / bitmapWidth);
-        view.setLayoutParams(params);
-    }
-
-    private List<Map<String, Object>> getData() {
-        List<Map<String, Object>> list;
-        Map<String, Object> map;
+    private List<List<Object>> getData() {
+        List<List<Object>> list;
+        List<Object> item;
 
         FileProcessor.checkDirs();
         fileProcessor = new FileProcessor();
 
-        list = new ArrayList<Map<String, Object>>();
+        list = new ArrayList<List<Object>>();
         List<String> groupNames = fileProcessor.getAllGroupName();
-        for (Iterator<String> iterator = groupNames.iterator(); iterator
-                .hasNext(); ) {
-            String groupName = iterator.next();
-            map = new HashMap<String, Object>();
-            map.put("groupName", groupName);
+        for (String groupName : groupNames) {
+            item = new ArrayList<Object>();
+            // item 第一个字符串为组名
+            item.add(groupName);
             List<String> filePaths = fileProcessor.getGroup(groupName);
             for (int i = 0; i < filePaths.size(); i++) {
                 String picPath = filePaths.get(i);
                 try {
-                    map.put("preview" + i, PicProcessor.getBitmapFromUri(getBaseContext(), Uri.fromFile(new File(picPath)), PicProcessor.SCALE_SMALL));
+                    item.add(PicProcessor.getBitmapFromUri(getBaseContext(), Uri.fromFile(new File(picPath)), PicProcessor.SCALE_SMALL));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -129,92 +287,17 @@ public class GroupList extends ListActivity implements OnItemClickListener {
                     break;
                 }
             }
-            list.add(map);
+            list.add(item);
         }
 
         return list;
     }
 
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.group_list_context_menu, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        PictureProcessHandler handler = PictureProcessHandler.getIntance();
-
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-                .getMenuInfo();
-        int id = (int) info.id;
-        Map<String, Object> map = list.get(id);
-        mCurrentGroupName = (String) map.get("groupName");
-        switch (item.getItemId()) {
-            case R.id.newGroup:
-                createNewGroup();
-                return true;
-            case R.id.deleteGroup:
-                deleteGroup(id);
-                return true;
-            case R.id.generateGif:
-                handler.generateGif(mCurrentGroupName);
-                return true;
-            case R.id.combinate_h:
-                handler.combineHorizonal(mCurrentGroupName);
-                return true;
-            case R.id.combinate_v:
-                handler.combineVertical(mCurrentGroupName);
-                return true;
-            case R.id.add_new_pic:
-                addNewPic();
-                return true;
-            case R.id.share:
-                share(mCurrentGroupName);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
-
-    private void share(String groupName) {
-        Uri uri = Uri.parse("file://" + new FileProcessor().getGroup(groupName).get(0));
-        ShareUtils.share(this, groupName, uri);
-    }
-
-    private void deleteGroup(int id) {
-        fileProcessor.removeGroup(mCurrentGroupName, false);
-        list.remove(id);
-        ((BaseAdapter) getListAdapter()).notifyDataSetChanged();
-    }
-
-    private void createNewGroup() {
-        Intent i = new Intent(this, CreateNewGroup.class);
-        startActivityForResult(i, CREATE_GROUP);
-    }
-
-    private void addNewPic() {
-        Intent i = new Intent(this, PreviewAndPicture.class);
-        i.putExtra(PreviewAndPicture.KEY_FROM, GroupList.class.getSimpleName());
-        i.putExtra(PreviewAndPicture.KEY_MENG_PATH, (fileProcessor.getGroup(mCurrentGroupName).get(0)));
-        startActivityForResult(i, ADD_NEW_PICTURE);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
-        Intent i = new Intent(this, ViewPicture.class);
-        i.putExtra("groupName", list.get(pos).get("groupName").toString());
-        startActivity(i);
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // TODO Auto-generated method stub
         super.onSaveInstanceState(outState);
         outState.putString("groupName", mCurrentGroupName);
+        LogHelper.d(TAG, "groupName = " + mCurrentGroupName);
     }
 
     @Override
@@ -222,6 +305,8 @@ public class GroupList extends ListActivity implements OnItemClickListener {
         // TODO Auto-generated method stub
         super.onRestoreInstanceState(state);
         mCurrentGroupName = state.getString("groupName");
+        LogHelper.d(TAG, "restore groupName = " + mCurrentGroupName);
+
     }
 
     @Override
@@ -229,21 +314,20 @@ public class GroupList extends ListActivity implements OnItemClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         Log.e(TAG, "onActivityResult");
         if (requestCode == CREATE_GROUP && resultCode == RESULT_OK) {
-            Map<String, Object> map = new HashMap<String, Object>();
+            List<Object> map = new ArrayList<Object>();
             String groupName = data.getExtras().getString("groupName");
-            map.put("groupName", groupName);
+            map.add(groupName);
             List<String> filePaths = fileProcessor.getGroup(groupName);
             for (int i = 0; i < filePaths.size(); i++) {
                 String picPath = filePaths.get(i);
-                map.put("preview" + i, BitmapFactory.decodeFile(picPath));
+                map.add(BitmapFactory.decodeFile(picPath));
                 if (i == 3) {
                     break;
                 }
             }
-            list.add(map);
-            ((BaseAdapter) getListAdapter()).notifyDataSetChanged();
+            mData.add(map);
+            mAdapter.notifyDataSetChanged();
         } else if (requestCode == ADD_NEW_PICTURE && resultCode == RESULT_OK) {
-            Log.e(TAG, "groupName = " + mCurrentGroupName);
             try {
                 fileProcessor.addToGroup(this, mCurrentGroupName, data.getData());
             } catch (IOException e) {

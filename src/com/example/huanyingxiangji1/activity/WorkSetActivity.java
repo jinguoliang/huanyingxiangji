@@ -118,7 +118,7 @@ public class WorkSetActivity extends Activity implements
 	@Override
 	public void onLoadFinished(Loader<List<ImageData>> loader, List<ImageData> data) {
 //		mAdapter.setData(data);
-//		// The list should now be shown.
+//		// The mData should now be shown.
 //		mGallery.setAdapter(mAdapter);
 //		setListShown(true);
 //		mAdapter.notifyDataSetInvalidated();

@@ -2,18 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="#ffffff">
 
 
-    <ListView
-        android:id="@android:id/list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/group_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/main_color_taste"
-        android:drawSelectorOnTop="false" />
+        android:layout_height="match_parent">
+    </android.support.v7.widget.RecyclerView>
     <RelativeLayout
-        android:id="@android:id/empty"
+        android:id="@+id/group_list_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/main_color_taste" >
